@@ -2,15 +2,15 @@
   <html lang="en">
     <head>
       <meta name="generator" content="Primo" />
-      <title>Menu</title><!-- HEAD_svelte-1lw70r8_START --><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta charset="UTF-8"><link rel="preconnect" href="https://fonts.bunny.net"><link href="https://fonts.bunny.net/css?family=fredoka:300,400,500,600,700|lato:300,400,700,900" rel="stylesheet"><meta name="description" content=""><style>@import url("https://unpkg.com/@primo-app/primo@1.3.64/reset.css");
+      <title>Menu</title><!-- HEAD_svelte-maw1au_START --><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta charset="UTF-8"><link rel="preconnect" href="https://fonts.bunny.net"><link href="https://fonts.bunny.net/css?family=fredoka:300,400,500,600,700|lato:300,400,700,900" rel="stylesheet"><meta name="description" content=""><style>@import url("https://unpkg.com/@primo-app/primo@1.3.64/reset.css");
 
 html {
   /* Theme */
   --color-accent: #716996;
   --color-shade: #e2e1ea;
 
-  --font-heading: "Fredoka", sans-serif;
-  --font-base: "Lato", sans-serif;
+  --font-heading: "Inter", sans-serif;
+  --font-base: "Inter", sans-serif;
 
   /* Default property values */
   --background: #f4f3f0;
@@ -60,7 +60,7 @@ html {
 .content h1 {
     font-family: var(--font-heading);
     font-size: 2.75rem;
-    font-weight: 500;
+    font-weight: 700;
     line-height: 1.1;
     margin-bottom: 1.5rem;
   }
@@ -68,7 +68,7 @@ html {
 .content h2 {
     font-family: var(--font-heading);
     font-size: 2.5rem;
-    font-weight: 500;
+    font-weight: 700;
     line-height: 1.1;
     margin-bottom: 1rem;
   }
@@ -76,7 +76,7 @@ html {
 .content h3 {
     font-family: var(--font-heading);
     font-size: 2.25rem;
-    font-weight: 500;
+    font-weight: 700;
     margin-bottom: 0.5rem;
     line-height: 1.1;
   }
@@ -101,6 +101,8 @@ html {
   }
 
 .section-container {
+  position: relative;
+  z-index: 2;
   width: 100%;
   max-width: var(--max-width, 1200px);
   margin: 0 auto;
@@ -111,7 +113,7 @@ html {
   font-family: var(--font-heading);
   font-size: 2.5rem;
   line-height: 1.1;
-  font-weight: 500;
+  font-weight: 700;
   color: #333;
 }
 
@@ -175,7 +177,7 @@ html {
   white-space: nowrap;
   border-width: 0;
 }
-</style><!-- HEAD_svelte-1lw70r8_END -->
+</style><!-- HEAD_svelte-maw1au_END -->
       <style>@import url("https://unpkg.com/modern-normalize@1.1.0/modern-normalize.css");header.svelte-6vjs4t.svelte-6vjs4t.svelte-6vjs4t{border-bottom:1px solid var(--border-color)}.section-container.svelte-6vjs4t.svelte-6vjs4t.svelte-6vjs4t{display:flex;justify-content:space-between;align-items:center;padding-top:0.75rem;padding-bottom:0.75rem}.desktop-nav.svelte-6vjs4t.svelte-6vjs4t.svelte-6vjs4t{display:flex;align-items:center;justify-content:space-between;gap:1.5rem;width:100%}.desktop-nav.svelte-6vjs4t .logo.svelte-6vjs4t.svelte-6vjs4t{font-size:1.5rem;font-weight:600;line-height:1.4;margin-right:1.5rem;width:var(--size)}.desktop-nav.svelte-6vjs4t nav.svelte-6vjs4t.svelte-6vjs4t{display:flex;align-items:center;gap:1.5rem}.desktop-nav.svelte-6vjs4t nav.svelte-6vjs4t a.svelte-6vjs4t{font-size:1rem;font-weight:400;display:none}.desktop-nav.svelte-6vjs4t nav a.nav-item.svelte-6vjs4t.svelte-6vjs4t{border-bottom:2px solid transparent;transition:border-color 0.1s}.desktop-nav.svelte-6vjs4t nav a.nav-item.svelte-6vjs4t.svelte-6vjs4t:hover{border-color:var(--color-brand)}.desktop-nav.svelte-6vjs4t button#open.svelte-6vjs4t.svelte-6vjs4t{font-size:1.5rem;margin-left:auto}nav#mobile-nav.svelte-6vjs4t.svelte-6vjs4t.svelte-6vjs4t{position:absolute;flex-direction:column;text-align:center;background-color:var(--background-color, white);box-shadow:var(--box-shadow);border-radius:var(--border-radius);left:0.5rem;top:0.5rem;right:0.5rem;padding:2rem;z-index:2}nav#mobile-nav.svelte-6vjs4t a.svelte-6vjs4t.svelte-6vjs4t{display:block}nav#mobile-nav.svelte-6vjs4t hr.svelte-6vjs4t.svelte-6vjs4t{width:100%}nav#mobile-nav.svelte-6vjs4t .button.svelte-6vjs4t.svelte-6vjs4t{width:100%;justify-content:center}nav#mobile-nav.svelte-6vjs4t button#close.svelte-6vjs4t.svelte-6vjs4t{display:block;position:absolute;right:1rem;top:1rem;font-size:1.5rem}@media(min-width: 600px){#open.svelte-6vjs4t.svelte-6vjs4t.svelte-6vjs4t,#mobile-nav.svelte-6vjs4t.svelte-6vjs4t.svelte-6vjs4t{display:none}.desktop-nav.svelte-6vjs4t nav.svelte-6vjs4t a.svelte-6vjs4t{display:inline-block}}
 .section-container.svelte-1ef0mlv.svelte-1ef0mlv{max-width:900px;padding-top:3rem;position:relative;z-index:1}.header-section.svelte-1ef0mlv.svelte-1ef0mlv{padding-top:1rem;text-align:center;margin-bottom:4rem;padding:0}.teasers.svelte-1ef0mlv.svelte-1ef0mlv{display:grid;gap:3rem}.teaser.svelte-1ef0mlv.svelte-1ef0mlv{display:grid;row-gap:2rem;-moz-column-gap:6rem;column-gap:6rem;place-items:center start}.teaser.svelte-1ef0mlv .image img.svelte-1ef0mlv{z-index:1;border-radius:var(--border-radius)}.teaser.svelte-1ef0mlv .body .title.svelte-1ef0mlv{font-family:var(--font-heading);margin-bottom:0.75rem;font-weight:500;font-size:2rem;line-height:2rem;color:var(--color)}.teaser.svelte-1ef0mlv .body .description.svelte-1ef0mlv{font-size:1.25rem;line-height:2rem;margin-bottom:1.5rem}@media(min-width: 800px){.teaser.svelte-1ef0mlv .body .title.svelte-1ef0mlv{font-family:var(--font-heading);margin-bottom:0.75rem;font-weight:500;font-size:2.25rem;line-height:2.5rem;color:var(--color)}.teaser.svelte-1ef0mlv .body .description.svelte-1ef0mlv{font-size:1.25rem;line-height:2rem;margin-bottom:1.5rem}}@media(min-width: 800px){.teaser.svelte-1ef0mlv.svelte-1ef0mlv{grid-template-columns:1fr 1fr
 }}svg.svelte-1ef0mlv.svelte-1ef0mlv{width:clamp(100px, 20vw, 200px);position:absolute;bottom:0;left:0;transform-origin:left;-webkit-animation:pulse 7s ease-in-out 0.5s infinite alternate;animation:pulse 7s ease-in-out 0.5s infinite alternate}svg.svelte-1ef0mlv.svelte-1ef0mlv:last-child{bottom:initial;left:initial;top:0;right:0;transform-origin:right}@media(prefers-reduced-motion){svg.svelte-1ef0mlv.svelte-1ef0mlv{-webkit-animation:none;animation:none

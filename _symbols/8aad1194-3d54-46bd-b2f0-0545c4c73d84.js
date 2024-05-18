@@ -3194,7 +3194,7 @@ function create_each_block_3(ctx) {
 			this.h();
 		},
 		h() {
-			attr(a, "class", "nav-item svelte-6vjs4t");
+			attr(a, "class", "nav-item svelte-g696es");
 			attr(a, "href", a_href_value = /*link*/ ctx[8].url);
 		},
 		m(target, anchor) {
@@ -3235,7 +3235,7 @@ function create_each_block_2(ctx) {
 			this.h();
 		},
 		h() {
-			attr(a, "class", "button svelte-6vjs4t");
+			attr(a, "class", "button svelte-g696es");
 			attr(a, "href", a_href_value = /*link*/ ctx[8].url);
 		},
 		m(target, anchor) {
@@ -3349,12 +3349,12 @@ function create_if_block(ctx) {
 			this.h();
 		},
 		h() {
-			attr(hr, "class", "svelte-6vjs4t");
+			attr(hr, "class", "svelte-g696es");
 			attr(button, "id", "close");
 			attr(button, "aria-label", "Close Navigation");
-			attr(button, "class", "svelte-6vjs4t");
+			attr(button, "class", "svelte-g696es");
 			attr(nav, "id", "mobile-nav");
-			attr(nav, "class", "svelte-6vjs4t");
+			attr(nav, "class", "svelte-g696es");
 		},
 		m(target, anchor) {
 			insert_hydration(target, nav, anchor);
@@ -3566,7 +3566,7 @@ function create_each_block_1(ctx) {
 		},
 		h() {
 			attr(a, "href", a_href_value = /*link*/ ctx[8].url);
-			attr(a, "class", "svelte-6vjs4t");
+			attr(a, "class", "svelte-g696es");
 		},
 		m(target, anchor) {
 			insert_hydration(target, a, anchor);
@@ -3607,7 +3607,7 @@ function create_each_block(ctx) {
 		},
 		h() {
 			attr(a, "href", a_href_value = /*link*/ ctx[8].url);
-			attr(a, "class", "button svelte-6vjs4t");
+			attr(a, "class", "button svelte-g696es");
 		},
 		m(target, anchor) {
 			insert_hydration(target, a, anchor);
@@ -3740,15 +3740,15 @@ function create_fragment(ctx) {
 		},
 		h() {
 			attr(a, "href", "/");
-			attr(a, "class", "logo svelte-6vjs4t");
+			attr(a, "class", "logo svelte-g696es");
 			set_style(a, "--size", style___size);
 			attr(button, "id", "open");
 			attr(button, "aria-label", "Open mobile navigation");
-			attr(button, "class", "svelte-6vjs4t");
-			attr(nav, "class", "svelte-6vjs4t");
-			attr(div0, "class", "desktop-nav svelte-6vjs4t");
-			attr(div1, "class", "section-container svelte-6vjs4t");
-			attr(header, "class", "svelte-6vjs4t");
+			attr(button, "class", "svelte-g696es");
+			attr(nav, "class", "svelte-g696es");
+			attr(div0, "class", "desktop-nav svelte-g696es");
+			attr(div1, "class", "section-container svelte-g696es");
+			attr(header, "class", "svelte-g696es");
 		},
 		m(target, anchor) {
 			insert_hydration(target, header, anchor);

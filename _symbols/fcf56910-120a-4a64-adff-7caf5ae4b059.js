@@ -2863,9 +2863,9 @@ function create_each_block(ctx) {
 			this.h();
 		},
 		h() {
-			attr(span0, "class", "icon svelte-lgft89");
+			attr(span0, "class", "icon svelte-1h7nku7");
 			attr(span1, "class", "label");
-			attr(li, "class", "svelte-lgft89");
+			attr(li, "class", "svelte-1h7nku7");
 		},
 		m(target, anchor) {
 			insert_hydration(target, li, anchor);
@@ -2980,15 +2980,15 @@ function create_fragment(ctx) {
 			this.h();
 		},
 		h() {
-			attr(h20, "class", "heading svelte-lgft89");
+			attr(h20, "class", "heading svelte-1h7nku7");
 			if (!src_url_equal(img.src, img_src_value = /*image*/ ctx[0].url)) attr(img, "src", img_src_value);
 			attr(img, "alt", img_alt_value = /*image*/ ctx[0].alt);
-			attr(img, "class", "svelte-lgft89");
-			attr(h21, "class", "title svelte-lgft89");
-			attr(ul, "class", "svelte-lgft89");
-			attr(div0, "class", "contact-info svelte-lgft89");
-			attr(div1, "class", "main svelte-lgft89");
-			attr(section, "class", "section-container svelte-lgft89");
+			attr(img, "class", "svelte-1h7nku7");
+			attr(h21, "class", "title svelte-1h7nku7");
+			attr(ul, "class", "svelte-1h7nku7");
+			attr(div0, "class", "contact-info svelte-1h7nku7");
+			attr(div1, "class", "main svelte-1h7nku7");
+			attr(section, "class", "section-container svelte-1h7nku7");
 		},
 		m(target, anchor) {
 			insert_hydration(target, section, anchor);

@@ -1,4 +1,4 @@
-// Site Footer - Updated May 18, 2024
+// Site Footer 1 - Updated May 18, 2024
 function noop() { }
 function assign(tar, src) {
     // @ts-ignore
@@ -2820,7 +2820,7 @@ function get_each_context_1(ctx, list, i) {
 	return child_ctx;
 }
 
-// (79:4) {#each links as { link }}
+// (62:4) {#each nav as { link }}
 function create_each_block_1(ctx) {
 	let a;
 	let t_value = /*link*/ ctx[3].label + "";
@@ -2841,7 +2841,7 @@ function create_each_block_1(ctx) {
 			this.h();
 		},
 		h() {
-			attr(a, "class", "link svelte-15rfssv");
+			attr(a, "class", "link svelte-1m1m225");
 			attr(a, "href", a_href_value = /*link*/ ctx[3].url);
 		},
 		m(target, anchor) {
@@ -2849,9 +2849,9 @@ function create_each_block_1(ctx) {
 			append_hydration(a, t);
 		},
 		p(ctx, dirty) {
-			if (dirty & /*links*/ 1 && t_value !== (t_value = /*link*/ ctx[3].label + "")) set_data(t, t_value);
+			if (dirty & /*nav*/ 1 && t_value !== (t_value = /*link*/ ctx[3].label + "")) set_data(t, t_value);
 
-			if (dirty & /*links*/ 1 && a_href_value !== (a_href_value = /*link*/ ctx[3].url)) {
+			if (dirty & /*nav*/ 1 && a_href_value !== (a_href_value = /*link*/ ctx[3].url)) {
 				attr(a, "href", a_href_value);
 			}
 		},
@@ -2861,7 +2861,7 @@ function create_each_block_1(ctx) {
 	};
 }
 
-// (86:4) {#each social as { link, icon }}
+// (68:4) {#each social as { link, icon }}
 function create_each_block(ctx) {
 	let a;
 	let icon;
@@ -2894,7 +2894,7 @@ function create_each_block(ctx) {
 		h() {
 			attr(a, "href", a_href_value = /*link*/ ctx[3].url);
 			attr(a, "aria-label", a_aria_label_value = /*link*/ ctx[3].label);
-			attr(a, "class", "svelte-15rfssv");
+			attr(a, "class", "svelte-1m1m225");
 		},
 		m(target, anchor) {
 			insert_hydration(target, a, anchor);
@@ -2933,19 +2933,16 @@ function create_each_block(ctx) {
 
 function create_fragment(ctx) {
 	let footer;
-	let nav;
+	let nav_1;
 	let t0;
-	let span0;
-	let t1;
+	let span;
 	let a;
+	let t1;
 	let t2;
 	let t3;
-	let span1;
-	let t4;
-	let t5;
 	let div;
 	let current;
-	let each_value_1 = /*links*/ ctx[0];
+	let each_value_1 = /*nav*/ ctx[0];
 	let each_blocks_1 = [];
 
 	for (let i = 0; i < each_value_1.length; i += 1) {
@@ -2966,21 +2963,18 @@ function create_fragment(ctx) {
 	return {
 		c() {
 			footer = element("footer");
-			nav = element("nav");
+			nav_1 = element("nav");
 
 			for (let i = 0; i < each_blocks_1.length; i += 1) {
 				each_blocks_1[i].c();
 			}
 
 			t0 = space();
-			span0 = element("span");
-			t1 = text("Powered by ");
+			span = element("span");
 			a = element("a");
-			t2 = text("Collaboration");
+			t1 = text("Primo");
+			t2 = text(" Powered");
 			t3 = space();
-			span1 = element("span");
-			t4 = text("Beard Collaborative © 2024. All Rights Reserved.");
-			t5 = space();
 			div = element("div");
 
 			for (let i = 0; i < each_blocks.length; i += 1) {
@@ -2992,29 +2986,24 @@ function create_fragment(ctx) {
 		l(nodes) {
 			footer = claim_element(nodes, "FOOTER", { class: true });
 			var footer_nodes = children(footer);
-			nav = claim_element(footer_nodes, "NAV", { class: true });
-			var nav_nodes = children(nav);
+			nav_1 = claim_element(footer_nodes, "NAV", { class: true });
+			var nav_1_nodes = children(nav_1);
 
 			for (let i = 0; i < each_blocks_1.length; i += 1) {
-				each_blocks_1[i].l(nav_nodes);
+				each_blocks_1[i].l(nav_1_nodes);
 			}
 
-			nav_nodes.forEach(detach);
+			nav_1_nodes.forEach(detach);
 			t0 = claim_space(footer_nodes);
-			span0 = claim_element(footer_nodes, "SPAN", { class: true });
-			var span0_nodes = children(span0);
-			t1 = claim_text(span0_nodes, "Powered by ");
-			a = claim_element(span0_nodes, "A", { href: true, class: true });
+			span = claim_element(footer_nodes, "SPAN", { class: true });
+			var span_nodes = children(span);
+			a = claim_element(span_nodes, "A", { href: true, class: true });
 			var a_nodes = children(a);
-			t2 = claim_text(a_nodes, "Collaboration");
+			t1 = claim_text(a_nodes, "Primo");
 			a_nodes.forEach(detach);
-			span0_nodes.forEach(detach);
+			t2 = claim_text(span_nodes, " Powered");
+			span_nodes.forEach(detach);
 			t3 = claim_space(footer_nodes);
-			span1 = claim_element(footer_nodes, "SPAN", { class: true });
-			var span1_nodes = children(span1);
-			t4 = claim_text(span1_nodes, "Beard Collaborative © 2024. All Rights Reserved.");
-			span1_nodes.forEach(detach);
-			t5 = claim_space(footer_nodes);
 			div = claim_element(footer_nodes, "DIV", { class: true });
 			var div_nodes = children(div);
 
@@ -3027,33 +3016,29 @@ function create_fragment(ctx) {
 			this.h();
 		},
 		h() {
-			attr(nav, "class", "svelte-15rfssv");
-			attr(a, "href", "https://beardcollaborative.com");
-			attr(a, "class", "svelte-15rfssv");
-			attr(span0, "class", "primo svelte-15rfssv");
-			attr(span1, "class", "rights-reserved svelte-15rfssv");
-			attr(div, "class", "social-links svelte-15rfssv");
-			attr(footer, "class", "section-container svelte-15rfssv");
+			attr(nav_1, "class", "svelte-1m1m225");
+			attr(a, "href", "https://primo.so");
+			attr(a, "class", "svelte-1m1m225");
+			attr(span, "class", "primo svelte-1m1m225");
+			attr(div, "class", "social-links svelte-1m1m225");
+			attr(footer, "class", "section-container svelte-1m1m225");
 		},
 		m(target, anchor) {
 			insert_hydration(target, footer, anchor);
-			append_hydration(footer, nav);
+			append_hydration(footer, nav_1);
 
 			for (let i = 0; i < each_blocks_1.length; i += 1) {
 				if (each_blocks_1[i]) {
-					each_blocks_1[i].m(nav, null);
+					each_blocks_1[i].m(nav_1, null);
 				}
 			}
 
 			append_hydration(footer, t0);
-			append_hydration(footer, span0);
-			append_hydration(span0, t1);
-			append_hydration(span0, a);
-			append_hydration(a, t2);
+			append_hydration(footer, span);
+			append_hydration(span, a);
+			append_hydration(a, t1);
+			append_hydration(span, t2);
 			append_hydration(footer, t3);
-			append_hydration(footer, span1);
-			append_hydration(span1, t4);
-			append_hydration(footer, t5);
 			append_hydration(footer, div);
 
 			for (let i = 0; i < each_blocks.length; i += 1) {
@@ -3065,8 +3050,8 @@ function create_fragment(ctx) {
 			current = true;
 		},
 		p(ctx, [dirty]) {
-			if (dirty & /*links*/ 1) {
-				each_value_1 = /*links*/ ctx[0];
+			if (dirty & /*nav*/ 1) {
+				each_value_1 = /*nav*/ ctx[0];
 				let i;
 
 				for (i = 0; i < each_value_1.length; i += 1) {
@@ -3077,7 +3062,7 @@ function create_fragment(ctx) {
 					} else {
 						each_blocks_1[i] = create_each_block_1(child_ctx);
 						each_blocks_1[i].c();
-						each_blocks_1[i].m(nav, null);
+						each_blocks_1[i].m(nav_1, null);
 					}
 				}
 
@@ -3143,22 +3128,22 @@ function create_fragment(ctx) {
 
 function instance($$self, $$props, $$invalidate) {
 	let { props } = $$props;
-	let { links } = $$props;
+	let { nav } = $$props;
 	let { social } = $$props;
 
 	$$self.$$set = $$props => {
 		if ('props' in $$props) $$invalidate(2, props = $$props.props);
-		if ('links' in $$props) $$invalidate(0, links = $$props.links);
+		if ('nav' in $$props) $$invalidate(0, nav = $$props.nav);
 		if ('social' in $$props) $$invalidate(1, social = $$props.social);
 	};
 
-	return [links, social, props];
+	return [nav, social, props];
 }
 
 class Component extends SvelteComponent {
 	constructor(options) {
 		super();
-		init(this, options, instance, create_fragment, safe_not_equal, { props: 2, links: 0, social: 1 });
+		init(this, options, instance, create_fragment, safe_not_equal, { props: 2, nav: 0, social: 1 });
 	}
 }
 

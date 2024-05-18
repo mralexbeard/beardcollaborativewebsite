@@ -3194,7 +3194,7 @@ function create_each_block_3(ctx) {
 			this.h();
 		},
 		h() {
-			attr(a, "class", "nav-item svelte-vdodh");
+			attr(a, "class", "nav-item svelte-1uupftf");
 			attr(a, "href", a_href_value = /*link*/ ctx[8].url);
 		},
 		m(target, anchor) {
@@ -3235,7 +3235,7 @@ function create_each_block_2(ctx) {
 			this.h();
 		},
 		h() {
-			attr(a, "class", "button svelte-vdodh");
+			attr(a, "class", "button svelte-1uupftf");
 			attr(a, "href", a_href_value = /*link*/ ctx[8].url);
 		},
 		m(target, anchor) {
@@ -3349,12 +3349,12 @@ function create_if_block(ctx) {
 			this.h();
 		},
 		h() {
-			attr(hr, "class", "svelte-vdodh");
+			attr(hr, "class", "svelte-1uupftf");
 			attr(button, "id", "close");
 			attr(button, "aria-label", "Close Navigation");
-			attr(button, "class", "svelte-vdodh");
+			attr(button, "class", "svelte-1uupftf");
 			attr(nav, "id", "mobile-nav");
-			attr(nav, "class", "svelte-vdodh");
+			attr(nav, "class", "svelte-1uupftf");
 		},
 		m(target, anchor) {
 			insert_hydration(target, nav, anchor);
@@ -3566,7 +3566,7 @@ function create_each_block_1(ctx) {
 		},
 		h() {
 			attr(a, "href", a_href_value = /*link*/ ctx[8].url);
-			attr(a, "class", "svelte-vdodh");
+			attr(a, "class", "svelte-1uupftf");
 		},
 		m(target, anchor) {
 			insert_hydration(target, a, anchor);
@@ -3607,7 +3607,7 @@ function create_each_block(ctx) {
 		},
 		h() {
 			attr(a, "href", a_href_value = /*link*/ ctx[8].url);
-			attr(a, "class", "button svelte-vdodh");
+			attr(a, "class", "button svelte-1uupftf");
 		},
 		m(target, anchor) {
 			insert_hydration(target, a, anchor);
@@ -3740,15 +3740,15 @@ function create_fragment(ctx) {
 		},
 		h() {
 			attr(a, "href", "/");
-			attr(a, "class", "logo svelte-vdodh");
+			attr(a, "class", "logo svelte-1uupftf");
 			set_style(a, "--size", style___size);
 			attr(button, "id", "open");
 			attr(button, "aria-label", "Open mobile navigation");
-			attr(button, "class", "svelte-vdodh");
-			attr(nav, "class", "svelte-vdodh");
-			attr(div0, "class", "desktop-nav svelte-vdodh");
-			attr(div1, "class", "section-container svelte-vdodh");
-			attr(header, "class", "svelte-vdodh");
+			attr(button, "class", "svelte-1uupftf");
+			attr(nav, "class", "svelte-1uupftf");
+			attr(div0, "class", "desktop-nav svelte-1uupftf");
+			attr(div1, "class", "section-container svelte-1uupftf");
+			attr(header, "class", "svelte-1uupftf");
 		},
 		m(target, anchor) {
 			insert_hydration(target, header, anchor);

@@ -1,6 +1,5 @@
 // Navigation 2 - Updated May 18, 2024
 function noop() { }
-const identity = x => x;
 function assign(tar, src) {
     // @ts-ignore
     for (const k in src)
@@ -39,41 +38,6 @@ function exclude_internal_props(props) {
         if (k[0] !== '$')
             result[k] = props[k];
     return result;
-}
-
-const is_client = typeof window !== 'undefined';
-let now = is_client
-    ? () => window.performance.now()
-    : () => Date.now();
-let raf = is_client ? cb => requestAnimationFrame(cb) : noop;
-
-const tasks = new Set();
-function run_tasks(now) {
-    tasks.forEach(task => {
-        if (!task.c(now)) {
-            tasks.delete(task);
-            task.f();
-        }
-    });
-    if (tasks.size !== 0)
-        raf(run_tasks);
-}
-/**
- * Creates a new task that runs on each raf frame
- * until it returns a falsy value or is aborted
- */
-function loop(callback) {
-    let task;
-    if (tasks.size === 0)
-        raf(run_tasks);
-    return {
-        promise: new Promise(fulfill => {
-            tasks.add(task = { c: callback, f: fulfill });
-        }),
-        abort() {
-            tasks.delete(task);
-        }
-    };
 }
 
 // Track which nodes are claimed during hydration. Unclaimed nodes can then be removed from the DOM
@@ -176,27 +140,6 @@ function init_hydrate(target) {
         const anchor = j < lis.length ? lis[j] : null;
         target.insertBefore(toMove[i], anchor);
     }
-}
-function append(target, node) {
-    target.appendChild(node);
-}
-function get_root_for_style(node) {
-    if (!node)
-        return document;
-    const root = node.getRootNode ? node.getRootNode() : node.ownerDocument;
-    if (root && root.host) {
-        return root;
-    }
-    return node.ownerDocument;
-}
-function append_empty_stylesheet(node) {
-    const style_element = element('style');
-    append_stylesheet(get_root_for_style(node), style_element);
-    return style_element.sheet;
-}
-function append_stylesheet(node, style) {
-    append(node.head || node, style);
-    return style.sheet;
 }
 function append_hydration(target, node) {
     if (is_hydrating) {
@@ -414,71 +357,6 @@ function custom_event(type, detail, { bubbles = false, cancelable = false } = {}
     return e;
 }
 
-// we need to store the information for multiple documents because a Svelte application could also contain iframes
-// https://github.com/sveltejs/svelte/issues/3624
-const managed_styles = new Map();
-let active = 0;
-// https://github.com/darkskyapp/string-hash/blob/master/index.js
-function hash(str) {
-    let hash = 5381;
-    let i = str.length;
-    while (i--)
-        hash = ((hash << 5) - hash) ^ str.charCodeAt(i);
-    return hash >>> 0;
-}
-function create_style_information(doc, node) {
-    const info = { stylesheet: append_empty_stylesheet(node), rules: {} };
-    managed_styles.set(doc, info);
-    return info;
-}
-function create_rule(node, a, b, duration, delay, ease, fn, uid = 0) {
-    const step = 16.666 / duration;
-    let keyframes = '{\n';
-    for (let p = 0; p <= 1; p += step) {
-        const t = a + (b - a) * ease(p);
-        keyframes += p * 100 + `%{${fn(t, 1 - t)}}\n`;
-    }
-    const rule = keyframes + `100% {${fn(b, 1 - b)}}\n}`;
-    const name = `__svelte_${hash(rule)}_${uid}`;
-    const doc = get_root_for_style(node);
-    const { stylesheet, rules } = managed_styles.get(doc) || create_style_information(doc, node);
-    if (!rules[name]) {
-        rules[name] = true;
-        stylesheet.insertRule(`@keyframes ${name} ${rule}`, stylesheet.cssRules.length);
-    }
-    const animation = node.style.animation || '';
-    node.style.animation = `${animation ? `${animation}, ` : ''}${name} ${duration}ms linear ${delay}ms 1 both`;
-    active += 1;
-    return name;
-}
-function delete_rule(node, name) {
-    const previous = (node.style.animation || '').split(', ');
-    const next = previous.filter(name
-        ? anim => anim.indexOf(name) < 0 // remove specific animation
-        : anim => anim.indexOf('__svelte') === -1 // remove all Svelte animations
-    );
-    const deleted = previous.length - next.length;
-    if (deleted) {
-        node.style.animation = next.join(', ');
-        active -= deleted;
-        if (!active)
-            clear_rules();
-    }
-}
-function clear_rules() {
-    raf(() => {
-        if (active)
-            return;
-        managed_styles.forEach(info => {
-            const { ownerNode } = info.stylesheet;
-            // there is no ownerNode if it runs on jsdom.
-            if (ownerNode)
-                detach(ownerNode);
-        });
-        managed_styles.clear();
-    });
-}
-
 let current_component;
 function set_current_component(component) {
     current_component = component;
@@ -645,20 +523,6 @@ function flush_render_callbacks(fns) {
     targets.forEach((c) => c());
     render_callbacks = filtered;
 }
-
-let promise;
-function wait() {
-    if (!promise) {
-        promise = Promise.resolve();
-        promise.then(() => {
-            promise = null;
-        });
-    }
-    return promise;
-}
-function dispatch(node, direction, kind) {
-    node.dispatchEvent(custom_event(`${direction ? 'intro' : 'outro'}${kind}`));
-}
 const outroing = new Set();
 let outros;
 function group_outros() {
@@ -698,113 +562,6 @@ function transition_out(block, local, detach, callback) {
     else if (callback) {
         callback();
     }
-}
-const null_transition = { duration: 0 };
-function create_bidirectional_transition(node, fn, params, intro) {
-    const options = { direction: 'both' };
-    let config = fn(node, params, options);
-    let t = intro ? 0 : 1;
-    let running_program = null;
-    let pending_program = null;
-    let animation_name = null;
-    function clear_animation() {
-        if (animation_name)
-            delete_rule(node, animation_name);
-    }
-    function init(program, duration) {
-        const d = (program.b - t);
-        duration *= Math.abs(d);
-        return {
-            a: t,
-            b: program.b,
-            d,
-            duration,
-            start: program.start,
-            end: program.start + duration,
-            group: program.group
-        };
-    }
-    function go(b) {
-        const { delay = 0, duration = 300, easing = identity, tick = noop, css } = config || null_transition;
-        const program = {
-            start: now() + delay,
-            b
-        };
-        if (!b) {
-            // @ts-ignore todo: improve typings
-            program.group = outros;
-            outros.r += 1;
-        }
-        if (running_program || pending_program) {
-            pending_program = program;
-        }
-        else {
-            // if this is an intro, and there's a delay, we need to do
-            // an initial tick and/or apply CSS animation immediately
-            if (css) {
-                clear_animation();
-                animation_name = create_rule(node, t, b, duration, delay, easing, css);
-            }
-            if (b)
-                tick(0, 1);
-            running_program = init(program, duration);
-            add_render_callback(() => dispatch(node, b, 'start'));
-            loop(now => {
-                if (pending_program && now > pending_program.start) {
-                    running_program = init(pending_program, duration);
-                    pending_program = null;
-                    dispatch(node, running_program.b, 'start');
-                    if (css) {
-                        clear_animation();
-                        animation_name = create_rule(node, t, running_program.b, running_program.duration, 0, easing, config.css);
-                    }
-                }
-                if (running_program) {
-                    if (now >= running_program.end) {
-                        tick(t = running_program.b, 1 - t);
-                        dispatch(node, running_program.b, 'end');
-                        if (!pending_program) {
-                            // we're done
-                            if (running_program.b) {
-                                // intro — we can tidy up immediately
-                                clear_animation();
-                            }
-                            else {
-                                // outro — needs to be coordinated
-                                if (!--running_program.group.r)
-                                    run_all(running_program.group.c);
-                            }
-                        }
-                        running_program = null;
-                    }
-                    else if (now >= running_program.start) {
-                        const p = now - running_program.start;
-                        t = running_program.a + running_program.d * easing(p / running_program.duration);
-                        tick(t, 1 - t);
-                    }
-                }
-                return !!(running_program || pending_program);
-            });
-        }
-    }
-    return {
-        run(b) {
-            if (is_function(config)) {
-                wait().then(() => {
-                    // @ts-ignore
-                    config = config(options);
-                    go(b);
-                });
-            }
-            else {
-                go(b);
-            }
-        },
-        end() {
-            clear_animation();
-            running_program = pending_program = null;
-        }
-    };
 }
 
 function get_spread_update(levels, updates) {
@@ -979,16 +736,6 @@ class SvelteComponent {
             this.$$.skip_bound = false;
         }
     }
-}
-
-function fade(node, { delay = 0, duration = 400, easing = identity } = {}) {
-    const o = +getComputedStyle(node).opacity;
-    return {
-        delay,
-        duration,
-        easing,
-        css: t => `opacity: ${t * o}`
-    };
 }
 
 const matchIconName = /^[a-z0-9]+(-[a-z0-9]+)*$/;
@@ -3106,7 +2853,7 @@ function get_each_context_3(ctx, list, i) {
 	return child_ctx;
 }
 
-// (128:8) {:else}
+// (140:8) {:else}
 function create_else_block_1(ctx) {
 	let span;
 	let t_value = /*logo*/ ctx[1].title + "";
@@ -3136,7 +2883,7 @@ function create_else_block_1(ctx) {
 	};
 }
 
-// (126:8) {#if logo.image.url}
+// (138:8) {#if logo.image.url}
 function create_if_block_2(ctx) {
 	let img;
 	let img_src_value;
@@ -3173,7 +2920,7 @@ function create_if_block_2(ctx) {
 	};
 }
 
-// (133:8) {#each site_nav as { link }}
+// (145:8) {#each site_nav as { link }}
 function create_each_block_3(ctx) {
 	let a;
 	let t_value = /*link*/ ctx[8].label + "";
@@ -3194,7 +2941,7 @@ function create_each_block_3(ctx) {
 			this.h();
 		},
 		h() {
-			attr(a, "class", "nav-item svelte-6vjs4t");
+			attr(a, "class", "nav-item svelte-1mg000j");
 			attr(a, "href", a_href_value = /*link*/ ctx[8].url);
 		},
 		m(target, anchor) {
@@ -3214,7 +2961,7 @@ function create_each_block_3(ctx) {
 	};
 }
 
-// (136:8) {#each cta as { link }
+// (148:8) {#each cta as { link }
 function create_each_block_2(ctx) {
 	let a;
 	let t_value = /*link*/ ctx[8].label + "";
@@ -3235,7 +2982,7 @@ function create_each_block_2(ctx) {
 			this.h();
 		},
 		h() {
-			attr(a, "class", "button svelte-6vjs4t");
+			attr(a, "class", "button svelte-1mg000j");
 			attr(a, "href", a_href_value = /*link*/ ctx[8].url);
 		},
 		m(target, anchor) {
@@ -3255,9 +3002,10 @@ function create_each_block_2(ctx) {
 	};
 }
 
-// (147:4) {#if mobileNavOpen}
+// (159:4) {#if mobileNavOpen}
 function create_if_block(ctx) {
 	let nav;
+	let div;
 	let t0;
 	let t1;
 	let hr;
@@ -3265,7 +3013,6 @@ function create_if_block(ctx) {
 	let t3;
 	let button;
 	let icon;
-	let nav_transition;
 	let current;
 	let mounted;
 	let dispose;
@@ -3296,6 +3043,7 @@ function create_if_block(ctx) {
 	return {
 		c() {
 			nav = element("nav");
+			div = element("div");
 			if_block.c();
 			t0 = space();
 
@@ -3319,24 +3067,26 @@ function create_if_block(ctx) {
 		l(nodes) {
 			nav = claim_element(nodes, "NAV", { id: true, class: true });
 			var nav_nodes = children(nav);
-			if_block.l(nav_nodes);
-			t0 = claim_space(nav_nodes);
+			div = claim_element(nav_nodes, "DIV", { class: true });
+			var div_nodes = children(div);
+			if_block.l(div_nodes);
+			t0 = claim_space(div_nodes);
 
 			for (let i = 0; i < each_blocks_1.length; i += 1) {
-				each_blocks_1[i].l(nav_nodes);
+				each_blocks_1[i].l(div_nodes);
 			}
 
-			t1 = claim_space(nav_nodes);
-			hr = claim_element(nav_nodes, "HR", { class: true });
-			t2 = claim_space(nav_nodes);
+			t1 = claim_space(div_nodes);
+			hr = claim_element(div_nodes, "HR", { class: true });
+			t2 = claim_space(div_nodes);
 
 			for (let i = 0; i < each_blocks.length; i += 1) {
-				each_blocks[i].l(nav_nodes);
+				each_blocks[i].l(div_nodes);
 			}
 
-			t3 = claim_space(nav_nodes);
+			t3 = claim_space(div_nodes);
 
-			button = claim_element(nav_nodes, "BUTTON", {
+			button = claim_element(div_nodes, "BUTTON", {
 				id: true,
 				"aria-label": true,
 				class: true
@@ -3345,40 +3095,43 @@ function create_if_block(ctx) {
 			var button_nodes = children(button);
 			claim_component(icon.$$.fragment, button_nodes);
 			button_nodes.forEach(detach);
+			div_nodes.forEach(detach);
 			nav_nodes.forEach(detach);
 			this.h();
 		},
 		h() {
-			attr(hr, "class", "svelte-6vjs4t");
+			attr(hr, "class", "svelte-1mg000j");
 			attr(button, "id", "close");
 			attr(button, "aria-label", "Close Navigation");
-			attr(button, "class", "svelte-6vjs4t");
+			attr(button, "class", "svelte-1mg000j");
+			attr(div, "class", "mobile-nav-inner svelte-1mg000j");
 			attr(nav, "id", "mobile-nav");
-			attr(nav, "class", "svelte-6vjs4t");
+			attr(nav, "class", "svelte-1mg000j");
 		},
 		m(target, anchor) {
 			insert_hydration(target, nav, anchor);
-			if_block.m(nav, null);
-			append_hydration(nav, t0);
+			append_hydration(nav, div);
+			if_block.m(div, null);
+			append_hydration(div, t0);
 
 			for (let i = 0; i < each_blocks_1.length; i += 1) {
 				if (each_blocks_1[i]) {
-					each_blocks_1[i].m(nav, null);
+					each_blocks_1[i].m(div, null);
 				}
 			}
 
-			append_hydration(nav, t1);
-			append_hydration(nav, hr);
-			append_hydration(nav, t2);
+			append_hydration(div, t1);
+			append_hydration(div, hr);
+			append_hydration(div, t2);
 
 			for (let i = 0; i < each_blocks.length; i += 1) {
 				if (each_blocks[i]) {
-					each_blocks[i].m(nav, null);
+					each_blocks[i].m(div, null);
 				}
 			}
 
-			append_hydration(nav, t3);
-			append_hydration(nav, button);
+			append_hydration(div, t3);
+			append_hydration(div, button);
 			mount_component(icon, button, null);
 			current = true;
 
@@ -3396,7 +3149,7 @@ function create_if_block(ctx) {
 
 				if (if_block) {
 					if_block.c();
-					if_block.m(nav, t0);
+					if_block.m(div, t0);
 				}
 			}
 
@@ -3412,7 +3165,7 @@ function create_if_block(ctx) {
 					} else {
 						each_blocks_1[i] = create_each_block_1(child_ctx);
 						each_blocks_1[i].c();
-						each_blocks_1[i].m(nav, t1);
+						each_blocks_1[i].m(div, t1);
 					}
 				}
 
@@ -3435,7 +3188,7 @@ function create_if_block(ctx) {
 					} else {
 						each_blocks[i] = create_each_block(child_ctx);
 						each_blocks[i].c();
-						each_blocks[i].m(nav, t3);
+						each_blocks[i].m(div, t3);
 					}
 				}
 
@@ -3449,19 +3202,10 @@ function create_if_block(ctx) {
 		i(local) {
 			if (current) return;
 			transition_in(icon.$$.fragment, local);
-
-			add_render_callback(() => {
-				if (!current) return;
-				if (!nav_transition) nav_transition = create_bidirectional_transition(nav, fade, { duration: 200 }, true);
-				nav_transition.run(1);
-			});
-
 			current = true;
 		},
 		o(local) {
 			transition_out(icon.$$.fragment, local);
-			if (!nav_transition) nav_transition = create_bidirectional_transition(nav, fade, { duration: 200 }, false);
-			nav_transition.run(0);
 			current = false;
 		},
 		d(detaching) {
@@ -3470,14 +3214,13 @@ function create_if_block(ctx) {
 			destroy_each(each_blocks_1, detaching);
 			destroy_each(each_blocks, detaching);
 			destroy_component(icon);
-			if (detaching && nav_transition) nav_transition.end();
 			mounted = false;
 			dispose();
 		}
 	};
 }
 
-// (151:8) {:else}
+// (164:10) {:else}
 function create_else_block(ctx) {
 	let span;
 	let t_value = /*logo*/ ctx[1].title + "";
@@ -3507,7 +3250,7 @@ function create_else_block(ctx) {
 	};
 }
 
-// (149:8) {#if logo.image.url}
+// (162:10) {#if logo.image.url}
 function create_if_block_1(ctx) {
 	let img;
 	let img_src_value;
@@ -3544,7 +3287,7 @@ function create_if_block_1(ctx) {
 	};
 }
 
-// (154:8) {#each site_nav as { link }}
+// (167:10) {#each site_nav as { link }}
 function create_each_block_1(ctx) {
 	let a;
 	let t_value = /*link*/ ctx[8].label + "";
@@ -3566,7 +3309,7 @@ function create_each_block_1(ctx) {
 		},
 		h() {
 			attr(a, "href", a_href_value = /*link*/ ctx[8].url);
-			attr(a, "class", "svelte-6vjs4t");
+			attr(a, "class", "svelte-1mg000j");
 		},
 		m(target, anchor) {
 			insert_hydration(target, a, anchor);
@@ -3585,7 +3328,7 @@ function create_each_block_1(ctx) {
 	};
 }
 
-// (158:8) {#each cta as { link }
+// (171:10) {#each cta as { link }
 function create_each_block(ctx) {
 	let a;
 	let t_value = /*link*/ ctx[8].label + "";
@@ -3607,7 +3350,7 @@ function create_each_block(ctx) {
 		},
 		h() {
 			attr(a, "href", a_href_value = /*link*/ ctx[8].url);
-			attr(a, "class", "button svelte-6vjs4t");
+			attr(a, "class", "button svelte-1mg000j");
 		},
 		m(target, anchor) {
 			insert_hydration(target, a, anchor);
@@ -3631,7 +3374,6 @@ function create_fragment(ctx) {
 	let div1;
 	let div0;
 	let a;
-	let style___size = `${/*logo*/ ctx[1].size}rem`;
 	let t0;
 	let nav;
 	let t1;
@@ -3701,7 +3443,7 @@ function create_fragment(ctx) {
 			var div1_nodes = children(div1);
 			div0 = claim_element(div1_nodes, "DIV", { class: true });
 			var div0_nodes = children(div0);
-			a = claim_element(div0_nodes, "A", { href: true, class: true });
+			a = claim_element(div0_nodes, "A", { href: true, class: true, style: true });
 			var a_nodes = children(a);
 			if_block0.l(a_nodes);
 			a_nodes.forEach(detach);
@@ -3740,15 +3482,15 @@ function create_fragment(ctx) {
 		},
 		h() {
 			attr(a, "href", "/");
-			attr(a, "class", "logo svelte-6vjs4t");
-			set_style(a, "--size", style___size);
+			attr(a, "class", "logo svelte-1mg000j");
+			set_style(a, "--size", /*logo*/ ctx[1].size + "rem");
 			attr(button, "id", "open");
 			attr(button, "aria-label", "Open mobile navigation");
-			attr(button, "class", "svelte-6vjs4t");
-			attr(nav, "class", "svelte-6vjs4t");
-			attr(div0, "class", "desktop-nav svelte-6vjs4t");
-			attr(div1, "class", "section-container svelte-6vjs4t");
-			attr(header, "class", "svelte-6vjs4t");
+			attr(button, "class", "svelte-1mg000j");
+			attr(nav, "class", "svelte-1mg000j");
+			attr(div0, "class", "desktop-nav svelte-1mg000j");
+			attr(div1, "class", "section-container svelte-1mg000j");
+			attr(header, "class", "svelte-1mg000j");
 		},
 		m(target, anchor) {
 			insert_hydration(target, header, anchor);
@@ -3798,8 +3540,8 @@ function create_fragment(ctx) {
 				}
 			}
 
-			if (dirty & /*logo*/ 2 && style___size !== (style___size = `${/*logo*/ ctx[1].size}rem`)) {
-				set_style(a, "--size", style___size);
+			if (!current || dirty & /*logo*/ 2) {
+				set_style(a, "--size", /*logo*/ ctx[1].size + "rem");
 			}
 
 			if (dirty & /*site_nav*/ 4) {

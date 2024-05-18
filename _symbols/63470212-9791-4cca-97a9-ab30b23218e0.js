@@ -3032,7 +3032,7 @@ function get_each_context(ctx, list, i) {
 	return child_ctx;
 }
 
-// (146:6) {#key active_index}
+// (156:6) {#key active_index}
 function create_key_block(ctx) {
 	let div2;
 	let div0;
@@ -3072,10 +3072,10 @@ function create_key_block(ctx) {
 			this.h();
 		},
 		h() {
-			attr(div0, "class", "quote svelte-11vdrh3");
-			attr(span, "class", "name svelte-11vdrh3");
-			attr(div1, "class", "person svelte-11vdrh3");
-			attr(div2, "class", "card svelte-11vdrh3");
+			attr(div0, "class", "quote svelte-16pljb");
+			attr(span, "class", "name svelte-16pljb");
+			attr(div1, "class", "person svelte-16pljb");
+			attr(div2, "class", "card svelte-16pljb");
 		},
 		m(target, anchor) {
 			insert_hydration(target, div2, anchor);
@@ -3104,7 +3104,7 @@ function create_key_block(ctx) {
 	};
 }
 
-// (154:6) {#if testimonials.length > 1}
+// (164:6) {#if testimonials.length > 1}
 function create_if_block(ctx) {
 	let div;
 	let button0;
@@ -3151,11 +3151,11 @@ function create_if_block(ctx) {
 		h() {
 			button0.disabled = button0_disabled_value = /*active_index*/ ctx[2] === 0;
 			attr(button0, "aria-label", "Show previous item");
-			attr(button0, "class", "svelte-11vdrh3");
+			attr(button0, "class", "svelte-16pljb");
 			button1.disabled = button1_disabled_value = /*active_index*/ ctx[2] >= /*testimonials*/ ctx[1].length - 1;
 			attr(button1, "aria-label", "Show next item");
-			attr(button1, "class", "svelte-11vdrh3");
-			attr(div, "class", "controls svelte-11vdrh3");
+			attr(button1, "class", "svelte-16pljb");
+			attr(div, "class", "controls svelte-16pljb");
 		},
 		m(target, anchor) {
 			insert_hydration(target, div, anchor);
@@ -3205,7 +3205,7 @@ function create_if_block(ctx) {
 	};
 }
 
-// (172:6) {#each testimonials as _, i}
+// (182:6) {#each testimonials as _, i}
 function create_each_block(ctx) {
 	let button;
 	let icon;
@@ -3236,7 +3236,7 @@ function create_each_block(ctx) {
 		},
 		h() {
 			attr(button, "aria-label", "Go to item " + /*i*/ ctx[11]);
-			attr(button, "class", "svelte-11vdrh3");
+			attr(button, "class", "svelte-16pljb");
 			toggle_class(button, "active", /*i*/ ctx[11] === /*active_index*/ ctx[2]);
 		},
 		m(target, anchor) {
@@ -3366,17 +3366,17 @@ function create_fragment(ctx) {
 			this.h();
 		},
 		h() {
-			attr(h2, "class", "heading svelte-11vdrh3");
-			attr(div0, "class", "testimonial svelte-11vdrh3");
-			attr(div1, "class", "dots svelte-11vdrh3");
-			attr(div2, "class", "section-container svelte-11vdrh3");
+			attr(h2, "class", "heading svelte-16pljb");
+			attr(div0, "class", "testimonial svelte-16pljb");
+			attr(div1, "class", "dots svelte-16pljb");
+			attr(div2, "class", "section-container svelte-16pljb");
 			attr(path, "d", "M0.499993 171C23.176 171 44.9233 161.992 60.9576 145.958C76.992 129.923 86 108.176 86 85.5C86 62.824 76.992 41.0767 60.9576 25.0424C44.9233 9.00801 23.176 6.7786e-07 0.500013 -3.73732e-06L0.499996 85.5L0.499993 171Z");
 			attr(path, "fill", "var(--color-shade)");
 			attr(svg, "viewBox", "0 0 86 171");
 			attr(svg, "fill", "none");
 			attr(svg, "xmlns", "http://www.w3.org/2000/svg");
-			attr(svg, "class", "svelte-11vdrh3");
-			attr(aside, "class", "svelte-11vdrh3");
+			attr(svg, "class", "svelte-16pljb");
+			attr(aside, "class", "svelte-16pljb");
 		},
 		m(target, anchor) {
 			insert_hydration(target, aside, anchor);

@@ -157,9 +157,6 @@ function append_hydration(target, node) {
         target.appendChild(node);
     }
 }
-function insert(target, node, anchor) {
-    target.insertBefore(node, anchor || null);
-}
 function insert_hydration(target, node, anchor) {
     if (is_hydrating && !anchor) {
         append_hydration(target, node);
@@ -339,33 +336,6 @@ function claim_text(nodes, data) {
 function claim_space(nodes) {
     return claim_text(nodes, ' ');
 }
-function find_comment(nodes, text, start) {
-    for (let i = start; i < nodes.length; i += 1) {
-        const node = nodes[i];
-        if (node.nodeType === 8 /* comment node */ && node.textContent.trim() === text) {
-            return i;
-        }
-    }
-    return nodes.length;
-}
-function claim_html_tag(nodes, is_svg) {
-    // find html opening tag
-    const start_index = find_comment(nodes, 'HTML_TAG_START', 0);
-    const end_index = find_comment(nodes, 'HTML_TAG_END', start_index);
-    if (start_index === end_index) {
-        return new HtmlTagHydration(undefined, is_svg);
-    }
-    init_claim_info(nodes);
-    const html_tag_nodes = nodes.splice(start_index, end_index - start_index + 1);
-    detach(html_tag_nodes[0]);
-    detach(html_tag_nodes[html_tag_nodes.length - 1]);
-    const claimed_nodes = html_tag_nodes.slice(1, html_tag_nodes.length - 1);
-    for (const n of claimed_nodes) {
-        n.claim_order = nodes.claim_info.total_claimed;
-        nodes.claim_info.total_claimed += 1;
-    }
-    return new HtmlTagHydration(claimed_nodes, is_svg);
-}
 function set_data(text, data) {
     data = '' + data;
     if (text.data === data)
@@ -376,65 +346,6 @@ function custom_event(type, detail, { bubbles = false, cancelable = false } = {}
     const e = document.createEvent('CustomEvent');
     e.initCustomEvent(type, bubbles, cancelable, detail);
     return e;
-}
-class HtmlTag {
-    constructor(is_svg = false) {
-        this.is_svg = false;
-        this.is_svg = is_svg;
-        this.e = this.n = null;
-    }
-    c(html) {
-        this.h(html);
-    }
-    m(html, target, anchor = null) {
-        if (!this.e) {
-            if (this.is_svg)
-                this.e = svg_element(target.nodeName);
-            /** #7364  target for <template> may be provided as #document-fragment(11) */
-            else
-                this.e = element((target.nodeType === 11 ? 'TEMPLATE' : target.nodeName));
-            this.t = target.tagName !== 'TEMPLATE' ? target : target.content;
-            this.c(html);
-        }
-        this.i(anchor);
-    }
-    h(html) {
-        this.e.innerHTML = html;
-        this.n = Array.from(this.e.nodeName === 'TEMPLATE' ? this.e.content.childNodes : this.e.childNodes);
-    }
-    i(anchor) {
-        for (let i = 0; i < this.n.length; i += 1) {
-            insert(this.t, this.n[i], anchor);
-        }
-    }
-    p(html) {
-        this.d();
-        this.h(html);
-        this.i(this.a);
-    }
-    d() {
-        this.n.forEach(detach);
-    }
-}
-class HtmlTagHydration extends HtmlTag {
-    constructor(claimed_nodes, is_svg = false) {
-        super(is_svg);
-        this.e = this.n = null;
-        this.l = claimed_nodes;
-    }
-    c(html) {
-        if (this.l) {
-            this.n = this.l;
-        }
-        else {
-            super.c(html);
-        }
-    }
-    i(anchor) {
-        for (let i = 0; i < this.n.length; i += 1) {
-            insert_hydration(this.t, this.n[i], anchor);
-        }
-    }
 }
 
 let current_component;
@@ -2919,198 +2830,18 @@ var axios = module.exports;
 
 function get_each_context(ctx, list, i) {
 	const child_ctx = ctx.slice();
-	child_ctx[17] = list[i].label;
-	child_ctx[18] = list[i].type;
-	child_ctx[19] = list[i].placeholder;
-	child_ctx[20] = list[i].required;
-	child_ctx[23] = i;
-	const constants_0 = `${/*label*/ child_ctx[17]}-${/*i*/ child_ctx[23]}`;
-	child_ctx[21] = constants_0;
+	child_ctx[19] = list[i].label;
+	child_ctx[20] = list[i].type;
+	child_ctx[21] = list[i].placeholder;
+	child_ctx[22] = list[i].required;
+	child_ctx[25] = i;
+	const constants_0 = `${/*label*/ child_ctx[19]}-${/*i*/ child_ctx[25]}`;
+	child_ctx[23] = constants_0;
 	return child_ctx;
 }
 
-// (302:18) 
-function create_if_block_10(ctx) {
-	let div;
-	let html_tag;
-	let raw_value = /*submission_confirmation*/ ctx[4].error + "";
-	let t0;
-	let button;
-	let icon;
-	let t1;
-	let span;
-	let t2_value = /*submission_confirmation*/ ctx[4].submit_again + "";
-	let t2;
-	let current;
-	let mounted;
-	let dispose;
-	icon = new Component$1({ props: { icon: "mdi:arrow-left-thin" } });
-
-	return {
-		c() {
-			div = element("div");
-			html_tag = new HtmlTagHydration(false);
-			t0 = space();
-			button = element("button");
-			create_component(icon.$$.fragment);
-			t1 = space();
-			span = element("span");
-			t2 = text(t2_value);
-			this.h();
-		},
-		l(nodes) {
-			div = claim_element(nodes, "DIV", { class: true });
-			var div_nodes = children(div);
-			html_tag = claim_html_tag(div_nodes, false);
-			t0 = claim_space(div_nodes);
-			button = claim_element(div_nodes, "BUTTON", { class: true });
-			var button_nodes = children(button);
-			claim_component(icon.$$.fragment, button_nodes);
-			t1 = claim_space(button_nodes);
-			span = claim_element(button_nodes, "SPAN", { class: true });
-			var span_nodes = children(span);
-			t2 = claim_text(span_nodes, t2_value);
-			span_nodes.forEach(detach);
-			button_nodes.forEach(detach);
-			div_nodes.forEach(detach);
-			this.h();
-		},
-		h() {
-			html_tag.a = t0;
-			attr(span, "class", "svelte-1r6jp8h");
-			attr(button, "class", "svelte-1r6jp8h");
-			attr(div, "class", "section-container content svelte-1r6jp8h");
-		},
-		m(target, anchor) {
-			insert_hydration(target, div, anchor);
-			html_tag.m(raw_value, div);
-			append_hydration(div, t0);
-			append_hydration(div, button);
-			mount_component(icon, button, null);
-			append_hydration(button, t1);
-			append_hydration(button, span);
-			append_hydration(span, t2);
-			current = true;
-
-			if (!mounted) {
-				dispose = listen(button, "click", /*click_handler_1*/ ctx[16]);
-				mounted = true;
-			}
-		},
-		p(ctx, dirty) {
-			if ((!current || dirty & /*submission_confirmation*/ 16) && raw_value !== (raw_value = /*submission_confirmation*/ ctx[4].error + "")) html_tag.p(raw_value);
-			if ((!current || dirty & /*submission_confirmation*/ 16) && t2_value !== (t2_value = /*submission_confirmation*/ ctx[4].submit_again + "")) set_data(t2, t2_value);
-		},
-		i(local) {
-			if (current) return;
-			transition_in(icon.$$.fragment, local);
-			current = true;
-		},
-		o(local) {
-			transition_out(icon.$$.fragment, local);
-			current = false;
-		},
-		d(detaching) {
-			if (detaching) detach(div);
-			destroy_component(icon);
-			mounted = false;
-			dispose();
-		}
-	};
-}
-
-// (294:22) 
-function create_if_block_9(ctx) {
-	let div;
-	let html_tag;
-	let raw_value = /*submission_confirmation*/ ctx[4].content + "";
-	let t0;
-	let button;
-	let icon;
-	let t1;
-	let span;
-	let t2_value = /*submission_confirmation*/ ctx[4].submit_again + "";
-	let t2;
-	let current;
-	let mounted;
-	let dispose;
-	icon = new Component$1({ props: { icon: "mdi:arrow-left-thin" } });
-
-	return {
-		c() {
-			div = element("div");
-			html_tag = new HtmlTagHydration(false);
-			t0 = space();
-			button = element("button");
-			create_component(icon.$$.fragment);
-			t1 = space();
-			span = element("span");
-			t2 = text(t2_value);
-			this.h();
-		},
-		l(nodes) {
-			div = claim_element(nodes, "DIV", { class: true });
-			var div_nodes = children(div);
-			html_tag = claim_html_tag(div_nodes, false);
-			t0 = claim_space(div_nodes);
-			button = claim_element(div_nodes, "BUTTON", { class: true });
-			var button_nodes = children(button);
-			claim_component(icon.$$.fragment, button_nodes);
-			t1 = claim_space(button_nodes);
-			span = claim_element(button_nodes, "SPAN", { class: true });
-			var span_nodes = children(span);
-			t2 = claim_text(span_nodes, t2_value);
-			span_nodes.forEach(detach);
-			button_nodes.forEach(detach);
-			div_nodes.forEach(detach);
-			this.h();
-		},
-		h() {
-			html_tag.a = t0;
-			attr(span, "class", "svelte-1r6jp8h");
-			attr(button, "class", "svelte-1r6jp8h");
-			attr(div, "class", "section-container content svelte-1r6jp8h");
-		},
-		m(target, anchor) {
-			insert_hydration(target, div, anchor);
-			html_tag.m(raw_value, div);
-			append_hydration(div, t0);
-			append_hydration(div, button);
-			mount_component(icon, button, null);
-			append_hydration(button, t1);
-			append_hydration(button, span);
-			append_hydration(span, t2);
-			current = true;
-
-			if (!mounted) {
-				dispose = listen(button, "click", /*click_handler*/ ctx[15]);
-				mounted = true;
-			}
-		},
-		p(ctx, dirty) {
-			if ((!current || dirty & /*submission_confirmation*/ 16) && raw_value !== (raw_value = /*submission_confirmation*/ ctx[4].content + "")) html_tag.p(raw_value);
-			if ((!current || dirty & /*submission_confirmation*/ 16) && t2_value !== (t2_value = /*submission_confirmation*/ ctx[4].submit_again + "")) set_data(t2, t2_value);
-		},
-		i(local) {
-			if (current) return;
-			transition_in(icon.$$.fragment, local);
-			current = true;
-		},
-		o(local) {
-			transition_out(icon.$$.fragment, local);
-			current = false;
-		},
-		d(detaching) {
-			if (detaching) detach(div);
-			destroy_component(icon);
-			mounted = false;
-			dispose();
-		}
-	};
-}
-
-// (241:2) {#if !submitted && !error}
-function create_if_block(ctx) {
+// (262:2) {#if !submitted && !error}
+function create_if_block_3(ctx) {
 	let div2;
 	let div1;
 	let h2;
@@ -3204,15 +2935,15 @@ function create_if_block(ctx) {
 			this.h();
 		},
 		h() {
-			attr(h2, "class", "heading svelte-1r6jp8h");
-			attr(div0, "class", "footer-text svelte-1r6jp8h");
-			attr(span, "class", "svelte-1r6jp8h");
+			attr(h2, "class", "heading svelte-10l2zdh");
+			attr(div0, "class", "footer-text svelte-10l2zdh");
+			attr(span, "class", "svelte-10l2zdh");
 			attr(button, "type", "submit");
-			attr(button, "class", "button svelte-1r6jp8h");
+			attr(button, "class", "button svelte-10l2zdh");
 			button.disabled = button_disabled_value = !/*form_is_valid*/ ctx[9];
-			attr(form, "class", "svelte-1r6jp8h");
-			attr(div1, "class", "form svelte-1r6jp8h");
-			attr(div2, "class", "section-container svelte-1r6jp8h");
+			attr(form, "class", "svelte-10l2zdh");
+			attr(div1, "class", "form svelte-10l2zdh");
+			attr(div2, "class", "section-container svelte-10l2zdh");
 		},
 		m(target, anchor) {
 			insert_hydration(target, div2, anchor);
@@ -3240,14 +2971,14 @@ function create_if_block(ctx) {
 			current = true;
 
 			if (!mounted) {
-				dispose = listen(form, "submit", prevent_default(/*submit_form*/ ctx[11]));
+				dispose = listen(form, "submit", prevent_default(/*submit_form*/ ctx[14]));
 				mounted = true;
 			}
 		},
 		p(ctx, dirty) {
 			if (!current || dirty & /*heading*/ 4) set_data(t0, /*heading*/ ctx[2]);
 
-			if (dirty & /*errors, fields, add_file, event, files, update_form_validity*/ 5409) {
+			if (dirty & /*errors, fields, add_file, event, files, update_form_validity*/ 12577) {
 				each_value = /*fields*/ ctx[0];
 				let i;
 
@@ -3313,11 +3044,11 @@ function create_if_block(ctx) {
 	};
 }
 
-// (275:12) {:else}
+// (296:12) {:else}
 function create_else_block(ctx) {
 	let label;
 	let span;
-	let t0_value = /*label*/ ctx[17] + "";
+	let t0_value = /*label*/ ctx[19] + "";
 	let t0;
 	let t1;
 	let t2;
@@ -3329,8 +3060,8 @@ function create_else_block(ctx) {
 	let t3;
 	let mounted;
 	let dispose;
-	let if_block0 = /*required*/ ctx[20] && create_if_block_8();
-	let if_block1 = /*errors*/ ctx[8][/*label*/ ctx[17]] && create_if_block_7(ctx);
+	let if_block0 = /*required*/ ctx[22] && create_if_block_11();
+	let if_block1 = /*errors*/ ctx[8][/*label*/ ctx[19]] && create_if_block_10(ctx);
 
 	return {
 		c() {
@@ -3369,13 +3100,13 @@ function create_else_block(ctx) {
 			this.h();
 		},
 		h() {
-			attr(span, "class", "svelte-1r6jp8h");
-			attr(input, "type", input_type_value = /*type*/ ctx[18]);
-			attr(input, "name", input_name_value = /*label*/ ctx[17]);
-			attr(input, "placeholder", input_placeholder_value = /*placeholder*/ ctx[19]);
-			input.required = input_required_value = /*required*/ ctx[20];
-			attr(input, "class", "svelte-1r6jp8h");
-			attr(label, "class", "svelte-1r6jp8h");
+			attr(span, "class", "svelte-10l2zdh");
+			attr(input, "type", input_type_value = /*type*/ ctx[20]);
+			attr(input, "name", input_name_value = /*label*/ ctx[19]);
+			attr(input, "placeholder", input_placeholder_value = /*placeholder*/ ctx[21]);
+			input.required = input_required_value = /*required*/ ctx[22];
+			attr(input, "class", "svelte-10l2zdh");
+			attr(label, "class", "svelte-10l2zdh");
 		},
 		m(target, anchor) {
 			insert_hydration(target, label, anchor);
@@ -3389,16 +3120,16 @@ function create_else_block(ctx) {
 			if (if_block1) if_block1.m(label, null);
 
 			if (!mounted) {
-				dispose = listen(input, "input", /*update_form_validity*/ ctx[12]);
+				dispose = listen(input, "input", /*update_form_validity*/ ctx[13]);
 				mounted = true;
 			}
 		},
 		p(ctx, dirty) {
-			if (dirty & /*fields*/ 1 && t0_value !== (t0_value = /*label*/ ctx[17] + "")) set_data(t0, t0_value);
+			if (dirty & /*fields*/ 1 && t0_value !== (t0_value = /*label*/ ctx[19] + "")) set_data(t0, t0_value);
 
-			if (/*required*/ ctx[20]) {
+			if (/*required*/ ctx[22]) {
 				if (if_block0) ; else {
-					if_block0 = create_if_block_8();
+					if_block0 = create_if_block_11();
 					if_block0.c();
 					if_block0.m(span, null);
 				}
@@ -3407,27 +3138,27 @@ function create_else_block(ctx) {
 				if_block0 = null;
 			}
 
-			if (dirty & /*fields*/ 1 && input_type_value !== (input_type_value = /*type*/ ctx[18])) {
+			if (dirty & /*fields*/ 1 && input_type_value !== (input_type_value = /*type*/ ctx[20])) {
 				attr(input, "type", input_type_value);
 			}
 
-			if (dirty & /*fields*/ 1 && input_name_value !== (input_name_value = /*label*/ ctx[17])) {
+			if (dirty & /*fields*/ 1 && input_name_value !== (input_name_value = /*label*/ ctx[19])) {
 				attr(input, "name", input_name_value);
 			}
 
-			if (dirty & /*fields*/ 1 && input_placeholder_value !== (input_placeholder_value = /*placeholder*/ ctx[19])) {
+			if (dirty & /*fields*/ 1 && input_placeholder_value !== (input_placeholder_value = /*placeholder*/ ctx[21])) {
 				attr(input, "placeholder", input_placeholder_value);
 			}
 
-			if (dirty & /*fields*/ 1 && input_required_value !== (input_required_value = /*required*/ ctx[20])) {
+			if (dirty & /*fields*/ 1 && input_required_value !== (input_required_value = /*required*/ ctx[22])) {
 				input.required = input_required_value;
 			}
 
-			if (/*errors*/ ctx[8][/*label*/ ctx[17]]) {
+			if (/*errors*/ ctx[8][/*label*/ ctx[19]]) {
 				if (if_block1) {
 					if_block1.p(ctx, dirty);
 				} else {
-					if_block1 = create_if_block_7(ctx);
+					if_block1 = create_if_block_10(ctx);
 					if_block1.c();
 					if_block1.m(label, null);
 				}
@@ -3448,11 +3179,11 @@ function create_else_block(ctx) {
 	};
 }
 
-// (266:42) 
-function create_if_block_4(ctx) {
+// (287:42) 
+function create_if_block_7(ctx) {
 	let label;
 	let span;
-	let t0_value = /*label*/ ctx[17] + "";
+	let t0_value = /*label*/ ctx[19] + "";
 	let t0;
 	let t1;
 	let t2;
@@ -3463,8 +3194,8 @@ function create_if_block_4(ctx) {
 	let t3;
 	let mounted;
 	let dispose;
-	let if_block0 = /*required*/ ctx[20] && create_if_block_6();
-	let if_block1 = /*errors*/ ctx[8][/*label*/ ctx[17]] && create_if_block_5(ctx);
+	let if_block0 = /*required*/ ctx[22] && create_if_block_9();
+	let if_block1 = /*errors*/ ctx[8][/*label*/ ctx[19]] && create_if_block_8(ctx);
 
 	return {
 		c() {
@@ -3503,12 +3234,12 @@ function create_if_block_4(ctx) {
 			this.h();
 		},
 		h() {
-			attr(span, "class", "svelte-1r6jp8h");
-			attr(textarea, "name", textarea_name_value = /*label*/ ctx[17]);
-			attr(textarea, "placeholder", textarea_placeholder_value = /*placeholder*/ ctx[19]);
-			textarea.required = textarea_required_value = /*required*/ ctx[20];
-			attr(textarea, "class", "svelte-1r6jp8h");
-			attr(label, "class", "has-textarea svelte-1r6jp8h");
+			attr(span, "class", "svelte-10l2zdh");
+			attr(textarea, "name", textarea_name_value = /*label*/ ctx[19]);
+			attr(textarea, "placeholder", textarea_placeholder_value = /*placeholder*/ ctx[21]);
+			textarea.required = textarea_required_value = /*required*/ ctx[22];
+			attr(textarea, "class", "svelte-10l2zdh");
+			attr(label, "class", "has-textarea svelte-10l2zdh");
 		},
 		m(target, anchor) {
 			insert_hydration(target, label, anchor);
@@ -3522,16 +3253,16 @@ function create_if_block_4(ctx) {
 			if (if_block1) if_block1.m(label, null);
 
 			if (!mounted) {
-				dispose = listen(textarea, "input", /*update_form_validity*/ ctx[12]);
+				dispose = listen(textarea, "input", /*update_form_validity*/ ctx[13]);
 				mounted = true;
 			}
 		},
 		p(ctx, dirty) {
-			if (dirty & /*fields*/ 1 && t0_value !== (t0_value = /*label*/ ctx[17] + "")) set_data(t0, t0_value);
+			if (dirty & /*fields*/ 1 && t0_value !== (t0_value = /*label*/ ctx[19] + "")) set_data(t0, t0_value);
 
-			if (/*required*/ ctx[20]) {
+			if (/*required*/ ctx[22]) {
 				if (if_block0) ; else {
-					if_block0 = create_if_block_6();
+					if_block0 = create_if_block_9();
 					if_block0.c();
 					if_block0.m(span, null);
 				}
@@ -3540,23 +3271,23 @@ function create_if_block_4(ctx) {
 				if_block0 = null;
 			}
 
-			if (dirty & /*fields*/ 1 && textarea_name_value !== (textarea_name_value = /*label*/ ctx[17])) {
+			if (dirty & /*fields*/ 1 && textarea_name_value !== (textarea_name_value = /*label*/ ctx[19])) {
 				attr(textarea, "name", textarea_name_value);
 			}
 
-			if (dirty & /*fields*/ 1 && textarea_placeholder_value !== (textarea_placeholder_value = /*placeholder*/ ctx[19])) {
+			if (dirty & /*fields*/ 1 && textarea_placeholder_value !== (textarea_placeholder_value = /*placeholder*/ ctx[21])) {
 				attr(textarea, "placeholder", textarea_placeholder_value);
 			}
 
-			if (dirty & /*fields*/ 1 && textarea_required_value !== (textarea_required_value = /*required*/ ctx[20])) {
+			if (dirty & /*fields*/ 1 && textarea_required_value !== (textarea_required_value = /*required*/ ctx[22])) {
 				textarea.required = textarea_required_value;
 			}
 
-			if (/*errors*/ ctx[8][/*label*/ ctx[17]]) {
+			if (/*errors*/ ctx[8][/*label*/ ctx[19]]) {
 				if (if_block1) {
 					if_block1.p(ctx, dirty);
 				} else {
-					if_block1 = create_if_block_5(ctx);
+					if_block1 = create_if_block_8(ctx);
 					if_block1.c();
 					if_block1.m(label, null);
 				}
@@ -3577,17 +3308,17 @@ function create_if_block_4(ctx) {
 	};
 }
 
-// (248:12) {#if type === "file"}
-function create_if_block_1(ctx) {
+// (269:12) {#if type === "file"}
+function create_if_block_4(ctx) {
 	let label;
 	let span0;
-	let t0_value = /*label*/ ctx[17] + "";
+	let t0_value = /*label*/ ctx[19] + "";
 	let t0;
 	let t1;
 	let t2;
 	let div;
 	let span1;
-	let t3_value = (/*files*/ ctx[5][/*id*/ ctx[21]] || "Choose file") + "";
+	let t3_value = (/*files*/ ctx[5][/*id*/ ctx[23]] || "Choose file") + "";
 	let t3;
 	let t4;
 	let span2;
@@ -3601,9 +3332,9 @@ function create_if_block_1(ctx) {
 	let current;
 	let mounted;
 	let dispose;
-	let if_block0 = /*required*/ ctx[20] && create_if_block_3();
+	let if_block0 = /*required*/ ctx[22] && create_if_block_6();
 	icon = new Component$1({ props: { icon: "ep:upload-filled" } });
-	let if_block1 = /*errors*/ ctx[8][/*label*/ ctx[17]] && create_if_block_2(ctx);
+	let if_block1 = /*errors*/ ctx[8][/*label*/ ctx[19]] && create_if_block_5(ctx);
 
 	return {
 		c() {
@@ -3657,15 +3388,15 @@ function create_if_block_1(ctx) {
 			this.h();
 		},
 		h() {
-			attr(span0, "class", "svelte-1r6jp8h");
-			attr(span1, "class", "button-left svelte-1r6jp8h");
-			attr(span2, "class", "button-right svelte-1r6jp8h");
-			attr(div, "class", "field-item svelte-1r6jp8h");
-			attr(input, "name", input_name_value = /*label*/ ctx[17]);
+			attr(span0, "class", "svelte-10l2zdh");
+			attr(span1, "class", "button-left svelte-10l2zdh");
+			attr(span2, "class", "button-right svelte-10l2zdh");
+			attr(div, "class", "field-item svelte-10l2zdh");
+			attr(input, "name", input_name_value = /*label*/ ctx[19]);
 			attr(input, "type", "file");
-			input.required = input_required_value = /*required*/ ctx[20];
-			attr(input, "class", "svelte-1r6jp8h");
-			attr(label, "class", "file svelte-1r6jp8h");
+			input.required = input_required_value = /*required*/ ctx[22];
+			attr(input, "class", "svelte-10l2zdh");
+			attr(label, "class", "file svelte-10l2zdh");
 		},
 		m(target, anchor) {
 			insert_hydration(target, label, anchor);
@@ -3689,7 +3420,7 @@ function create_if_block_1(ctx) {
 
 			if (!mounted) {
 				dispose = listen(input, "change", function () {
-					if (is_function(/*add_file*/ ctx[10].bind(this, { id: /*id*/ ctx[21], e: event }))) /*add_file*/ ctx[10].bind(this, { id: /*id*/ ctx[21], e: event }).apply(this, arguments);
+					if (is_function(/*add_file*/ ctx[12].bind(this, { id: /*id*/ ctx[23], e: event }))) /*add_file*/ ctx[12].bind(this, { id: /*id*/ ctx[23], e: event }).apply(this, arguments);
 				});
 
 				mounted = true;
@@ -3697,11 +3428,11 @@ function create_if_block_1(ctx) {
 		},
 		p(new_ctx, dirty) {
 			ctx = new_ctx;
-			if ((!current || dirty & /*fields*/ 1) && t0_value !== (t0_value = /*label*/ ctx[17] + "")) set_data(t0, t0_value);
+			if ((!current || dirty & /*fields*/ 1) && t0_value !== (t0_value = /*label*/ ctx[19] + "")) set_data(t0, t0_value);
 
-			if (/*required*/ ctx[20]) {
+			if (/*required*/ ctx[22]) {
 				if (if_block0) ; else {
-					if_block0 = create_if_block_3();
+					if_block0 = create_if_block_6();
 					if_block0.c();
 					if_block0.m(span0, null);
 				}
@@ -3710,21 +3441,21 @@ function create_if_block_1(ctx) {
 				if_block0 = null;
 			}
 
-			if ((!current || dirty & /*files, fields*/ 33) && t3_value !== (t3_value = (/*files*/ ctx[5][/*id*/ ctx[21]] || "Choose file") + "")) set_data(t3, t3_value);
+			if ((!current || dirty & /*files, fields*/ 33) && t3_value !== (t3_value = (/*files*/ ctx[5][/*id*/ ctx[23]] || "Choose file") + "")) set_data(t3, t3_value);
 
-			if (!current || dirty & /*fields*/ 1 && input_name_value !== (input_name_value = /*label*/ ctx[17])) {
+			if (!current || dirty & /*fields*/ 1 && input_name_value !== (input_name_value = /*label*/ ctx[19])) {
 				attr(input, "name", input_name_value);
 			}
 
-			if (!current || dirty & /*fields*/ 1 && input_required_value !== (input_required_value = /*required*/ ctx[20])) {
+			if (!current || dirty & /*fields*/ 1 && input_required_value !== (input_required_value = /*required*/ ctx[22])) {
 				input.required = input_required_value;
 			}
 
-			if (/*errors*/ ctx[8][/*label*/ ctx[17]]) {
+			if (/*errors*/ ctx[8][/*label*/ ctx[19]]) {
 				if (if_block1) {
 					if_block1.p(ctx, dirty);
 				} else {
-					if_block1 = create_if_block_2(ctx);
+					if_block1 = create_if_block_5(ctx);
 					if_block1.c();
 					if_block1.m(label, null);
 				}
@@ -3753,8 +3484,8 @@ function create_if_block_1(ctx) {
 	};
 }
 
-// (279:18) {#if required}
-function create_if_block_8(ctx) {
+// (300:18) {#if required}
+function create_if_block_11(ctx) {
 	let span;
 	let t;
 
@@ -3772,7 +3503,7 @@ function create_if_block_8(ctx) {
 			this.h();
 		},
 		h() {
-			attr(span, "class", "required svelte-1r6jp8h");
+			attr(span, "class", "required svelte-10l2zdh");
 		},
 		m(target, anchor) {
 			insert_hydration(target, span, anchor);
@@ -3784,10 +3515,10 @@ function create_if_block_8(ctx) {
 	};
 }
 
-// (282:16) {#if errors[label]}
-function create_if_block_7(ctx) {
+// (303:16) {#if errors[label]}
+function create_if_block_10(ctx) {
 	let span;
-	let t_value = /*errors*/ ctx[8][/*label*/ ctx[17]] + "";
+	let t_value = /*errors*/ ctx[8][/*label*/ ctx[19]] + "";
 	let t;
 
 	return {
@@ -3804,14 +3535,14 @@ function create_if_block_7(ctx) {
 			this.h();
 		},
 		h() {
-			attr(span, "class", "error svelte-1r6jp8h");
+			attr(span, "class", "error svelte-10l2zdh");
 		},
 		m(target, anchor) {
 			insert_hydration(target, span, anchor);
 			append_hydration(span, t);
 		},
 		p(ctx, dirty) {
-			if (dirty & /*errors, fields*/ 257 && t_value !== (t_value = /*errors*/ ctx[8][/*label*/ ctx[17]] + "")) set_data(t, t_value);
+			if (dirty & /*errors, fields*/ 257 && t_value !== (t_value = /*errors*/ ctx[8][/*label*/ ctx[19]] + "")) set_data(t, t_value);
 		},
 		d(detaching) {
 			if (detaching) detach(span);
@@ -3819,7 +3550,73 @@ function create_if_block_7(ctx) {
 	};
 }
 
-// (270:18) {#if required}
+// (291:18) {#if required}
+function create_if_block_9(ctx) {
+	let span;
+	let t;
+
+	return {
+		c() {
+			span = element("span");
+			t = text("*");
+			this.h();
+		},
+		l(nodes) {
+			span = claim_element(nodes, "SPAN", { class: true });
+			var span_nodes = children(span);
+			t = claim_text(span_nodes, "*");
+			span_nodes.forEach(detach);
+			this.h();
+		},
+		h() {
+			attr(span, "class", "required svelte-10l2zdh");
+		},
+		m(target, anchor) {
+			insert_hydration(target, span, anchor);
+			append_hydration(span, t);
+		},
+		d(detaching) {
+			if (detaching) detach(span);
+		}
+	};
+}
+
+// (294:16) {#if errors[label]}
+function create_if_block_8(ctx) {
+	let span;
+	let t_value = /*errors*/ ctx[8][/*label*/ ctx[19]] + "";
+	let t;
+
+	return {
+		c() {
+			span = element("span");
+			t = text(t_value);
+			this.h();
+		},
+		l(nodes) {
+			span = claim_element(nodes, "SPAN", { class: true });
+			var span_nodes = children(span);
+			t = claim_text(span_nodes, t_value);
+			span_nodes.forEach(detach);
+			this.h();
+		},
+		h() {
+			attr(span, "class", "error svelte-10l2zdh");
+		},
+		m(target, anchor) {
+			insert_hydration(target, span, anchor);
+			append_hydration(span, t);
+		},
+		p(ctx, dirty) {
+			if (dirty & /*errors, fields*/ 257 && t_value !== (t_value = /*errors*/ ctx[8][/*label*/ ctx[19]] + "")) set_data(t, t_value);
+		},
+		d(detaching) {
+			if (detaching) detach(span);
+		}
+	};
+}
+
+// (273:18) {#if required}
 function create_if_block_6(ctx) {
 	let span;
 	let t;
@@ -3838,7 +3635,7 @@ function create_if_block_6(ctx) {
 			this.h();
 		},
 		h() {
-			attr(span, "class", "required svelte-1r6jp8h");
+			attr(span, "class", "required svelte-10l2zdh");
 		},
 		m(target, anchor) {
 			insert_hydration(target, span, anchor);
@@ -3850,10 +3647,10 @@ function create_if_block_6(ctx) {
 	};
 }
 
-// (273:16) {#if errors[label]}
+// (285:16) {#if errors[label]}
 function create_if_block_5(ctx) {
 	let span;
-	let t_value = /*errors*/ ctx[8][/*label*/ ctx[17]] + "";
+	let t_value = /*errors*/ ctx[8][/*label*/ ctx[19]] + "";
 	let t;
 
 	return {
@@ -3870,14 +3667,14 @@ function create_if_block_5(ctx) {
 			this.h();
 		},
 		h() {
-			attr(span, "class", "error svelte-1r6jp8h");
+			attr(span, "class", "error svelte-10l2zdh");
 		},
 		m(target, anchor) {
 			insert_hydration(target, span, anchor);
 			append_hydration(span, t);
 		},
 		p(ctx, dirty) {
-			if (dirty & /*errors, fields*/ 257 && t_value !== (t_value = /*errors*/ ctx[8][/*label*/ ctx[17]] + "")) set_data(t, t_value);
+			if (dirty & /*errors, fields*/ 257 && t_value !== (t_value = /*errors*/ ctx[8][/*label*/ ctx[19]] + "")) set_data(t, t_value);
 		},
 		d(detaching) {
 			if (detaching) detach(span);
@@ -3885,88 +3682,22 @@ function create_if_block_5(ctx) {
 	};
 }
 
-// (252:18) {#if required}
-function create_if_block_3(ctx) {
-	let span;
-	let t;
-
-	return {
-		c() {
-			span = element("span");
-			t = text("*");
-			this.h();
-		},
-		l(nodes) {
-			span = claim_element(nodes, "SPAN", { class: true });
-			var span_nodes = children(span);
-			t = claim_text(span_nodes, "*");
-			span_nodes.forEach(detach);
-			this.h();
-		},
-		h() {
-			attr(span, "class", "required svelte-1r6jp8h");
-		},
-		m(target, anchor) {
-			insert_hydration(target, span, anchor);
-			append_hydration(span, t);
-		},
-		d(detaching) {
-			if (detaching) detach(span);
-		}
-	};
-}
-
-// (264:16) {#if errors[label]}
-function create_if_block_2(ctx) {
-	let span;
-	let t_value = /*errors*/ ctx[8][/*label*/ ctx[17]] + "";
-	let t;
-
-	return {
-		c() {
-			span = element("span");
-			t = text(t_value);
-			this.h();
-		},
-		l(nodes) {
-			span = claim_element(nodes, "SPAN", { class: true });
-			var span_nodes = children(span);
-			t = claim_text(span_nodes, t_value);
-			span_nodes.forEach(detach);
-			this.h();
-		},
-		h() {
-			attr(span, "class", "error svelte-1r6jp8h");
-		},
-		m(target, anchor) {
-			insert_hydration(target, span, anchor);
-			append_hydration(span, t);
-		},
-		p(ctx, dirty) {
-			if (dirty & /*errors, fields*/ 257 && t_value !== (t_value = /*errors*/ ctx[8][/*label*/ ctx[17]] + "")) set_data(t, t_value);
-		},
-		d(detaching) {
-			if (detaching) detach(span);
-		}
-	};
-}
-
-// (246:10) {#each fields as { label, type, placeholder, required }
+// (267:10) {#each fields as { label, type, placeholder, required }
 function create_each_block(ctx) {
 	let current_block_type_index;
 	let if_block;
 	let if_block_anchor;
 	let current;
-	const if_block_creators = [create_if_block_1, create_if_block_4, create_else_block];
+	const if_block_creators = [create_if_block_4, create_if_block_7, create_else_block];
 	const if_blocks = [];
 
-	function select_block_type_1(ctx, dirty) {
-		if (/*type*/ ctx[18] === "file") return 0;
-		if (/*type*/ ctx[18] === "textarea") return 1;
+	function select_block_type(ctx, dirty) {
+		if (/*type*/ ctx[20] === "file") return 0;
+		if (/*type*/ ctx[20] === "textarea") return 1;
 		return 2;
 	}
 
-	current_block_type_index = select_block_type_1(ctx);
+	current_block_type_index = select_block_type(ctx);
 	if_block = if_blocks[current_block_type_index] = if_block_creators[current_block_type_index](ctx);
 
 	return {
@@ -3985,7 +3716,7 @@ function create_each_block(ctx) {
 		},
 		p(ctx, dirty) {
 			let previous_block_index = current_block_type_index;
-			current_block_type_index = select_block_type_1(ctx);
+			current_block_type_index = select_block_type(ctx);
 
 			if (current_block_type_index === previous_block_index) {
 				if_blocks[current_block_type_index].p(ctx, dirty);
@@ -4026,50 +3757,201 @@ function create_each_block(ctx) {
 	};
 }
 
-function create_fragment(ctx) {
-	let section;
-	let current_block_type_index;
-	let if_block;
+// (317:2) {#if submitted}
+function create_if_block_2(ctx) {
+	let div;
 	let t0;
-	let svg0;
-	let path0;
 	let t1;
-	let svg1;
-	let path1;
+	let button;
+	let icon;
+	let t2;
+	let span;
+	let t3_value = /*submission_confirmation*/ ctx[4].submit_again + "";
+	let t3;
 	let current;
-	const if_block_creators = [create_if_block, create_if_block_9, create_if_block_10];
-	const if_blocks = [];
-
-	function select_block_type(ctx, dirty) {
-		if (!/*submitted*/ ctx[6] && !/*error*/ ctx[7]) return 0;
-		if (/*submitted*/ ctx[6]) return 1;
-		if (/*error*/ ctx[7]) return 2;
-		return -1;
-	}
-
-	if (~(current_block_type_index = select_block_type(ctx))) {
-		if_block = if_blocks[current_block_type_index] = if_block_creators[current_block_type_index](ctx);
-	}
+	let mounted;
+	let dispose;
+	icon = new Component$1({ props: { icon: "mdi:arrow-left-thin" } });
 
 	return {
 		c() {
-			section = element("section");
-			if (if_block) if_block.c();
-			t0 = space();
+			div = element("div");
+			t0 = text(/*submission_message*/ ctx[10]);
+			t1 = space();
+			button = element("button");
+			create_component(icon.$$.fragment);
+			t2 = space();
+			span = element("span");
+			t3 = text(t3_value);
+			this.h();
+		},
+		l(nodes) {
+			div = claim_element(nodes, "DIV", { class: true });
+			var div_nodes = children(div);
+			t0 = claim_text(div_nodes, /*submission_message*/ ctx[10]);
+			t1 = claim_space(div_nodes);
+			button = claim_element(div_nodes, "BUTTON", { class: true });
+			var button_nodes = children(button);
+			claim_component(icon.$$.fragment, button_nodes);
+			t2 = claim_space(button_nodes);
+			span = claim_element(button_nodes, "SPAN", { class: true });
+			var span_nodes = children(span);
+			t3 = claim_text(span_nodes, t3_value);
+			span_nodes.forEach(detach);
+			button_nodes.forEach(detach);
+			div_nodes.forEach(detach);
+			this.h();
+		},
+		h() {
+			attr(span, "class", "svelte-10l2zdh");
+			attr(button, "class", "svelte-10l2zdh");
+			attr(div, "class", "section-container content svelte-10l2zdh");
+		},
+		m(target, anchor) {
+			insert_hydration(target, div, anchor);
+			append_hydration(div, t0);
+			append_hydration(div, t1);
+			append_hydration(div, button);
+			mount_component(icon, button, null);
+			append_hydration(button, t2);
+			append_hydration(button, span);
+			append_hydration(span, t3);
+			current = true;
+
+			if (!mounted) {
+				dispose = listen(button, "click", /*click_handler*/ ctx[17]);
+				mounted = true;
+			}
+		},
+		p(ctx, dirty) {
+			if (!current || dirty & /*submission_message*/ 1024) set_data(t0, /*submission_message*/ ctx[10]);
+			if ((!current || dirty & /*submission_confirmation*/ 16) && t3_value !== (t3_value = /*submission_confirmation*/ ctx[4].submit_again + "")) set_data(t3, t3_value);
+		},
+		i(local) {
+			if (current) return;
+			transition_in(icon.$$.fragment, local);
+			current = true;
+		},
+		o(local) {
+			transition_out(icon.$$.fragment, local);
+			current = false;
+		},
+		d(detaching) {
+			if (detaching) detach(div);
+			destroy_component(icon);
+			mounted = false;
+			dispose();
+		}
+	};
+}
+
+// (327:2) {#if error}
+function create_if_block_1(ctx) {
+	let div;
+	let t0;
+	let t1;
+	let button;
+	let icon;
+	let t2;
+	let span;
+	let t3_value = /*submission_confirmation*/ ctx[4].submit_again + "";
+	let t3;
+	let current;
+	let mounted;
+	let dispose;
+	icon = new Component$1({ props: { icon: "mdi:arrow-left-thin" } });
+
+	return {
+		c() {
+			div = element("div");
+			t0 = text(/*error_message*/ ctx[11]);
+			t1 = space();
+			button = element("button");
+			create_component(icon.$$.fragment);
+			t2 = space();
+			span = element("span");
+			t3 = text(t3_value);
+			this.h();
+		},
+		l(nodes) {
+			div = claim_element(nodes, "DIV", { class: true });
+			var div_nodes = children(div);
+			t0 = claim_text(div_nodes, /*error_message*/ ctx[11]);
+			t1 = claim_space(div_nodes);
+			button = claim_element(div_nodes, "BUTTON", { class: true });
+			var button_nodes = children(button);
+			claim_component(icon.$$.fragment, button_nodes);
+			t2 = claim_space(button_nodes);
+			span = claim_element(button_nodes, "SPAN", { class: true });
+			var span_nodes = children(span);
+			t3 = claim_text(span_nodes, t3_value);
+			span_nodes.forEach(detach);
+			button_nodes.forEach(detach);
+			div_nodes.forEach(detach);
+			this.h();
+		},
+		h() {
+			attr(span, "class", "svelte-10l2zdh");
+			attr(button, "class", "svelte-10l2zdh");
+			attr(div, "class", "section-container content svelte-10l2zdh");
+		},
+		m(target, anchor) {
+			insert_hydration(target, div, anchor);
+			append_hydration(div, t0);
+			append_hydration(div, t1);
+			append_hydration(div, button);
+			mount_component(icon, button, null);
+			append_hydration(button, t2);
+			append_hydration(button, span);
+			append_hydration(span, t3);
+			current = true;
+
+			if (!mounted) {
+				dispose = listen(button, "click", /*click_handler_1*/ ctx[18]);
+				mounted = true;
+			}
+		},
+		p(ctx, dirty) {
+			if (!current || dirty & /*error_message*/ 2048) set_data(t0, /*error_message*/ ctx[11]);
+			if ((!current || dirty & /*submission_confirmation*/ 16) && t3_value !== (t3_value = /*submission_confirmation*/ ctx[4].submit_again + "")) set_data(t3, t3_value);
+		},
+		i(local) {
+			if (current) return;
+			transition_in(icon.$$.fragment, local);
+			current = true;
+		},
+		o(local) {
+			transition_out(icon.$$.fragment, local);
+			current = false;
+		},
+		d(detaching) {
+			if (detaching) detach(div);
+			destroy_component(icon);
+			mounted = false;
+			dispose();
+		}
+	};
+}
+
+// (337:2) {#if !submitted && !error}
+function create_if_block(ctx) {
+	let svg0;
+	let path0;
+	let t;
+	let svg1;
+	let path1;
+
+	return {
+		c() {
 			svg0 = svg_element("svg");
 			path0 = svg_element("path");
-			t1 = space();
+			t = space();
 			svg1 = svg_element("svg");
 			path1 = svg_element("path");
 			this.h();
 		},
 		l(nodes) {
-			section = claim_element(nodes, "SECTION", { class: true });
-			var section_nodes = children(section);
-			if (if_block) if_block.l(section_nodes);
-			t0 = claim_space(section_nodes);
-
-			svg0 = claim_svg_element(section_nodes, "svg", {
+			svg0 = claim_svg_element(nodes, "svg", {
 				viewBox: true,
 				fill: true,
 				xmlns: true,
@@ -4080,9 +3962,9 @@ function create_fragment(ctx) {
 			path0 = claim_svg_element(svg0_nodes, "path", { d: true, fill: true, class: true });
 			children(path0).forEach(detach);
 			svg0_nodes.forEach(detach);
-			t1 = claim_space(section_nodes);
+			t = claim_space(nodes);
 
-			svg1 = claim_svg_element(section_nodes, "svg", {
+			svg1 = claim_svg_element(nodes, "svg", {
 				viewBox: true,
 				fill: true,
 				xmlns: true,
@@ -4093,92 +3975,189 @@ function create_fragment(ctx) {
 			path1 = claim_svg_element(svg1_nodes, "path", { d: true, fill: true, class: true });
 			children(path1).forEach(detach);
 			svg1_nodes.forEach(detach);
-			section_nodes.forEach(detach);
 			this.h();
 		},
 		h() {
 			attr(path0, "d", "M85.5 1.01958e-06C62.824 7.49169e-07 41.0767 9.00801 25.0424 25.0424C9.00801 41.0767 3.00198e-06 62.824 1.01958e-06 85.5C-9.62822e-07 108.176 9.00801 129.923 25.0424 145.958C41.0767 161.992 62.824 171 85.5 171L85.5 85.5L85.5 1.01958e-06Z");
 			attr(path0, "fill", "var(--color-shade)");
-			attr(path0, "class", "svelte-1r6jp8h");
+			attr(path0, "class", "svelte-10l2zdh");
 			attr(svg0, "viewBox", "0 0 86 171");
 			attr(svg0, "fill", "none");
 			attr(svg0, "xmlns", "http://www.w3.org/2000/svg");
-			attr(svg0, "class", "svelte-1r6jp8h");
+			attr(svg0, "class", "svelte-10l2zdh");
 			attr(path1, "d", "M0.499993 171C23.176 171 44.9233 161.992 60.9576 145.958C76.992 129.923 86 108.176 86 85.5C86 62.824 76.992 41.0767 60.9576 25.0424C44.9233 9.00801 23.176 6.7786e-07 0.500013 -3.73732e-06L0.499996 85.5L0.499993 171Z");
 			attr(path1, "fill", "var(--color-shade)");
-			attr(path1, "class", "svelte-1r6jp8h");
+			attr(path1, "class", "svelte-10l2zdh");
 			attr(svg1, "viewBox", "0 0 86 171");
 			attr(svg1, "fill", "none");
 			attr(svg1, "xmlns", "http://www.w3.org/2000/svg");
-			attr(svg1, "class", "svelte-1r6jp8h");
-			attr(section, "class", "svelte-1r6jp8h");
+			attr(svg1, "class", "svelte-10l2zdh");
+		},
+		m(target, anchor) {
+			insert_hydration(target, svg0, anchor);
+			append_hydration(svg0, path0);
+			insert_hydration(target, t, anchor);
+			insert_hydration(target, svg1, anchor);
+			append_hydration(svg1, path1);
+		},
+		d(detaching) {
+			if (detaching) detach(svg0);
+			if (detaching) detach(t);
+			if (detaching) detach(svg1);
+		}
+	};
+}
+
+function create_fragment(ctx) {
+	let section;
+	let t0;
+	let t1;
+	let t2;
+	let current;
+	let if_block0 = !/*submitted*/ ctx[6] && !/*error*/ ctx[7] && create_if_block_3(ctx);
+	let if_block1 = /*submitted*/ ctx[6] && create_if_block_2(ctx);
+	let if_block2 = /*error*/ ctx[7] && create_if_block_1(ctx);
+	let if_block3 = !/*submitted*/ ctx[6] && !/*error*/ ctx[7] && create_if_block();
+
+	return {
+		c() {
+			section = element("section");
+			if (if_block0) if_block0.c();
+			t0 = space();
+			if (if_block1) if_block1.c();
+			t1 = space();
+			if (if_block2) if_block2.c();
+			t2 = space();
+			if (if_block3) if_block3.c();
+			this.h();
+		},
+		l(nodes) {
+			section = claim_element(nodes, "SECTION", { class: true });
+			var section_nodes = children(section);
+			if (if_block0) if_block0.l(section_nodes);
+			t0 = claim_space(section_nodes);
+			if (if_block1) if_block1.l(section_nodes);
+			t1 = claim_space(section_nodes);
+			if (if_block2) if_block2.l(section_nodes);
+			t2 = claim_space(section_nodes);
+			if (if_block3) if_block3.l(section_nodes);
+			section_nodes.forEach(detach);
+			this.h();
+		},
+		h() {
+			attr(section, "class", "svelte-10l2zdh");
 		},
 		m(target, anchor) {
 			insert_hydration(target, section, anchor);
-
-			if (~current_block_type_index) {
-				if_blocks[current_block_type_index].m(section, null);
-			}
-
+			if (if_block0) if_block0.m(section, null);
 			append_hydration(section, t0);
-			append_hydration(section, svg0);
-			append_hydration(svg0, path0);
+			if (if_block1) if_block1.m(section, null);
 			append_hydration(section, t1);
-			append_hydration(section, svg1);
-			append_hydration(svg1, path1);
+			if (if_block2) if_block2.m(section, null);
+			append_hydration(section, t2);
+			if (if_block3) if_block3.m(section, null);
 			current = true;
 		},
 		p(ctx, [dirty]) {
-			let previous_block_index = current_block_type_index;
-			current_block_type_index = select_block_type(ctx);
+			if (!/*submitted*/ ctx[6] && !/*error*/ ctx[7]) {
+				if (if_block0) {
+					if_block0.p(ctx, dirty);
 
-			if (current_block_type_index === previous_block_index) {
-				if (~current_block_type_index) {
-					if_blocks[current_block_type_index].p(ctx, dirty);
-				}
-			} else {
-				if (if_block) {
-					group_outros();
-
-					transition_out(if_blocks[previous_block_index], 1, 1, () => {
-						if_blocks[previous_block_index] = null;
-					});
-
-					check_outros();
-				}
-
-				if (~current_block_type_index) {
-					if_block = if_blocks[current_block_type_index];
-
-					if (!if_block) {
-						if_block = if_blocks[current_block_type_index] = if_block_creators[current_block_type_index](ctx);
-						if_block.c();
-					} else {
-						if_block.p(ctx, dirty);
+					if (dirty & /*submitted, error*/ 192) {
+						transition_in(if_block0, 1);
 					}
-
-					transition_in(if_block, 1);
-					if_block.m(section, t0);
 				} else {
-					if_block = null;
+					if_block0 = create_if_block_3(ctx);
+					if_block0.c();
+					transition_in(if_block0, 1);
+					if_block0.m(section, t0);
 				}
+			} else if (if_block0) {
+				group_outros();
+
+				transition_out(if_block0, 1, 1, () => {
+					if_block0 = null;
+				});
+
+				check_outros();
+			}
+
+			if (/*submitted*/ ctx[6]) {
+				if (if_block1) {
+					if_block1.p(ctx, dirty);
+
+					if (dirty & /*submitted*/ 64) {
+						transition_in(if_block1, 1);
+					}
+				} else {
+					if_block1 = create_if_block_2(ctx);
+					if_block1.c();
+					transition_in(if_block1, 1);
+					if_block1.m(section, t1);
+				}
+			} else if (if_block1) {
+				group_outros();
+
+				transition_out(if_block1, 1, 1, () => {
+					if_block1 = null;
+				});
+
+				check_outros();
+			}
+
+			if (/*error*/ ctx[7]) {
+				if (if_block2) {
+					if_block2.p(ctx, dirty);
+
+					if (dirty & /*error*/ 128) {
+						transition_in(if_block2, 1);
+					}
+				} else {
+					if_block2 = create_if_block_1(ctx);
+					if_block2.c();
+					transition_in(if_block2, 1);
+					if_block2.m(section, t2);
+				}
+			} else if (if_block2) {
+				group_outros();
+
+				transition_out(if_block2, 1, 1, () => {
+					if_block2 = null;
+				});
+
+				check_outros();
+			}
+
+			if (!/*submitted*/ ctx[6] && !/*error*/ ctx[7]) {
+				if (if_block3) ; else {
+					if_block3 = create_if_block();
+					if_block3.c();
+					if_block3.m(section, null);
+				}
+			} else if (if_block3) {
+				if_block3.d(1);
+				if_block3 = null;
 			}
 		},
 		i(local) {
 			if (current) return;
-			transition_in(if_block);
+			transition_in(if_block0);
+			transition_in(if_block1);
+			transition_in(if_block2);
 			current = true;
 		},
 		o(local) {
-			transition_out(if_block);
+			transition_out(if_block0);
+			transition_out(if_block1);
+			transition_out(if_block2);
 			current = false;
 		},
 		d(detaching) {
 			if (detaching) detach(section);
-
-			if (~current_block_type_index) {
-				if_blocks[current_block_type_index].d();
-			}
+			if (if_block0) if_block0.d();
+			if (if_block1) if_block1.d();
+			if (if_block2) if_block2.d();
+			if (if_block3) if_block3.d();
 		}
 	};
 }
@@ -4211,7 +4190,7 @@ function validateField(field) {
 
 function get_form_data(form) {
 	const form_data = new FormData(form);
-	var object = {};
+	let object = {};
 
 	form_data.forEach((value, key) => {
 		object[key] = value;
@@ -4241,24 +4220,8 @@ function instance($$self, $$props, $$invalidate) {
 	let error = false;
 	let errors = {};
 	let form_is_valid = false;
-
-	async function submit_form(e) {
-		if (!form_is_valid) {
-			const inputs = e.target.querySelectorAll('input, textarea');
-			inputs.forEach(input => update_form_validity({ target: input }));
-			e.target.reportValidity();
-			return;
-		}
-
-		const form_data = get_form_data(e.target);
-		const { data } = await axios.post(form_endpoint, form_data).catch(e => ({ data: null }));
-
-		if (data) {
-			$$invalidate(6, submitted = true);
-		} else {
-			$$invalidate(7, error = true);
-		}
-	}
+	let submission_message = '';
+	let error_message = '';
 
 	function update_form_validity(e) {
 		const target = e.target;
@@ -4270,19 +4233,66 @@ function instance($$self, $$props, $$invalidate) {
 			delete errors[target.name];
 		}
 
+		// Trigger immediate update to form validity
 		$$invalidate(9, form_is_valid = Object.keys(errors).length === 0);
+
+		// Force a UI update by setting the errors object
+		$$invalidate(8, errors = { ...errors });
 	}
 
-	const click_handler = () => $$invalidate(6, submitted = false);
-	const click_handler_1 = () => $$invalidate(7, error = false);
+	async function submit_form(e) {
+		e.preventDefault();
+		const inputs = e.target.querySelectorAll('input, textarea');
+		inputs.forEach(input => update_form_validity({ target: input }));
+
+		if (!form_is_valid) {
+			e.target.reportValidity();
+			return;
+		}
+
+		const form_data = get_form_data(e.target);
+
+		try {
+			const response = await axios.post(form_endpoint, form_data);
+			const data = response.data;
+
+			if (data && typeof data === 'object') {
+				if (data.message) {
+					$$invalidate(10, submission_message = data.message);
+					$$invalidate(6, submitted = true);
+					$$invalidate(7, error = false);
+				} else {
+					$$invalidate(6, submitted = true);
+					$$invalidate(7, error = false);
+					$$invalidate(10, submission_message = 'Form submitted successfully!');
+				}
+			} else {
+				$$invalidate(11, error_message = 'An unexpected error occurred.');
+				$$invalidate(7, error = true);
+			}
+		} catch(err) {
+			$$invalidate(11, error_message = 'An error occurred while submitting the form.');
+			$$invalidate(7, error = true);
+		}
+	}
+
+	const click_handler = () => {
+		$$invalidate(6, submitted = false);
+		$$invalidate(10, submission_message = '');
+	};
+
+	const click_handler_1 = () => {
+		$$invalidate(7, error = false);
+		$$invalidate(11, error_message = '');
+	};
 
 	$$self.$$set = $$props => {
-		if ('props' in $$props) $$invalidate(13, props = $$props.props);
+		if ('props' in $$props) $$invalidate(15, props = $$props.props);
 		if ('fields' in $$props) $$invalidate(0, fields = $$props.fields);
 		if ('submit' in $$props) $$invalidate(1, submit = $$props.submit);
 		if ('heading' in $$props) $$invalidate(2, heading = $$props.heading);
 		if ('footer_text' in $$props) $$invalidate(3, footer_text = $$props.footer_text);
-		if ('form_endpoint' in $$props) $$invalidate(14, form_endpoint = $$props.form_endpoint);
+		if ('form_endpoint' in $$props) $$invalidate(16, form_endpoint = $$props.form_endpoint);
 		if ('submission_confirmation' in $$props) $$invalidate(4, submission_confirmation = $$props.submission_confirmation);
 	};
 
@@ -4297,9 +4307,11 @@ function instance($$self, $$props, $$invalidate) {
 		error,
 		errors,
 		form_is_valid,
+		submission_message,
+		error_message,
 		add_file,
-		submit_form,
 		update_form_validity,
+		submit_form,
 		props,
 		form_endpoint,
 		click_handler,
@@ -4312,12 +4324,12 @@ class Component extends SvelteComponent {
 		super();
 
 		init(this, options, instance, create_fragment, safe_not_equal, {
-			props: 13,
+			props: 15,
 			fields: 0,
 			submit: 1,
 			heading: 2,
 			footer_text: 3,
-			form_endpoint: 14,
+			form_endpoint: 16,
 			submission_confirmation: 4
 		});
 	}

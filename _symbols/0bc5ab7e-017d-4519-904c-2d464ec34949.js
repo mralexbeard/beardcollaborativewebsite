@@ -1,4 +1,4 @@
-// Site Footer - Updated May 23, 2024
+// Site Footer - Updated May 28, 2024
 function noop() { }
 function assign(tar, src) {
     // @ts-ignore
@@ -3028,7 +3028,7 @@ function create_fragment(ctx) {
 		},
 		h() {
 			attr(nav, "class", "svelte-15rfssv");
-			attr(a, "href", "https://beardcollaborative.com");
+			attr(a, "href", "https://www.beardcollaborative.com");
 			attr(a, "class", "svelte-15rfssv");
 			attr(span0, "class", "primo svelte-15rfssv");
 			attr(span1, "class", "rights-reserved svelte-15rfssv");

@@ -1,4 +1,4 @@
-// Site Footer - Updated May 28, 2024
+// Site Footer - Updated June 2, 2024
 function noop() { }
 function assign(tar, src) {
     // @ts-ignore

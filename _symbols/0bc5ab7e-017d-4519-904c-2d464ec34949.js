@@ -2979,7 +2979,7 @@ function create_fragment(ctx) {
 			t2 = text("Collaboration");
 			t3 = space();
 			span1 = element("span");
-			t4 = text("Beard Collaborative © 2024. All Rights Reserved.");
+			t4 = text("Beard Collaborative © 2025. All Rights Reserved.");
 			t5 = space();
 			div = element("div");
 
@@ -3012,7 +3012,7 @@ function create_fragment(ctx) {
 			t3 = claim_space(footer_nodes);
 			span1 = claim_element(footer_nodes, "SPAN", { class: true });
 			var span1_nodes = children(span1);
-			t4 = claim_text(span1_nodes, "Beard Collaborative © 2024. All Rights Reserved.");
+			t4 = claim_text(span1_nodes, "Beard Collaborative © 2025. All Rights Reserved.");
 			span1_nodes.forEach(detach);
 			t5 = claim_space(footer_nodes);
 			div = claim_element(footer_nodes, "DIV", { class: true });
